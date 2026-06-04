@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Lora } from "next/font/google";
+import Link from "next/link";
 import "./globals.css";
 import HeaderBrand from "@/components/HeaderBrand";
 
@@ -29,17 +30,41 @@ export default function RootLayout({
         <div className="w-full max-w-md min-h-screen bg-background shadow-xl flex flex-col relative">
           <HeaderBrand />
           {children}
-          <footer className="p-4 text-center text-xs text-black/50 mt-auto">
-            &copy; {new Date().getFullYear()} From Me 2 U. All rights reserved.<br />
-            Web app made by{" "}
-            <a 
-              href="https://www.facebook.com/idngcodes/" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-skyblue hover:underline"
+          <footer className="p-4 text-center text-xs text-black/50 mt-auto flex flex-col items-center gap-3">
+            <div>
+              &copy; {new Date().getFullYear()} From Me 2 U. All rights reserved.<br />
+              Web app made by{" "}
+              <a 
+                href="https://www.facebook.com/idngcodes/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-skyblue hover:underline"
+              >
+                @idongcodes
+              </a>
+            </div>
+            
+            {/* Future Admin Login Button */}
+            <Link 
+              href="/admin" 
+              className="text-black/20 hover:text-skyblue transition-colors p-2"
+              aria-label="Admin Login"
             >
-              @idongcodes
-            </a>
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="16" 
+                height="16" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              >
+                <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </Link>
           </footer>
         </div>
       </body>
