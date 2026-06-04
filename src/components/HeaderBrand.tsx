@@ -1,48 +1,56 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 
 export default function HeaderBrand() {
-  const [isVisible, setIsVisible] = useState(true);
-
-  useEffect(() => {
-    let timeout: NodeJS.Timeout;
-
-    const hideText = () => {
-      setIsVisible(false);
-    };
-
-    const handleScroll = () => {
-      setIsVisible(true);
-      clearTimeout(timeout);
-      timeout = setTimeout(hideText, 2000);
-    };
-
-    // Initial timeout to hide after mounting
-    timeout = setTimeout(hideText, 2000);
-
-    // Listen to window scroll
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      clearTimeout(timeout);
-    };
-  }, []);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <div className="sticky top-0 z-50 w-full h-0">
-      <div 
-        className={`absolute top-4 left-6 transition-opacity duration-500 ${
-          isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
-      >
+    <div className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-gray-100/50">
+      <div className="flex items-center justify-between px-6 py-4">
         <Link 
           href="/" 
           className="text-skyblue font-bold text-lg hover:underline drop-shadow-sm"
+          onClick={() => setIsMenuOpen(false)}
         >
           From Me 2 U
+        </Link>
+
+        <button 
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className="p-1 text-black/70 hover:text-skyblue transition-colors focus:outline-none"
+          aria-label="Toggle menu"
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            width="24" 
+            height="24" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+            className={`transition-transform duration-300 ${isMenuOpen ? "rotate-180" : ""}`}
+          >
+            <path d="m6 9 6 6 6-6"/>
+          </svg>
+        </button>
+      </div>
+
+      {/* Dropdown Menu */}
+      <div 
+        className={`absolute top-full left-0 w-full bg-white/95 backdrop-blur-md border-b border-gray-100/50 shadow-md flex flex-col overflow-hidden transition-all duration-300 ease-in-out ${
+          isMenuOpen ? "max-h-40 opacity-100" : "max-h-0 opacity-0 border-transparent"
+        }`}
+      >
+        <Link
+          href="/contact"
+          className="px-6 py-4 text-black/80 hover:bg-gray-50 hover:text-skyblue transition-colors font-medium"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          Contact Us
         </Link>
       </div>
     </div>
