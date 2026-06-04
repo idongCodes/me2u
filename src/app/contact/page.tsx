@@ -113,6 +113,19 @@ export default function ContactPage() {
             {pending ? "Sending..." : "Send Message"}
           </button>
         </form>
+
+        <div className="w-full mt-8 rounded-xl overflow-hidden border border-gray-200 shadow-sm bg-white">
+          <iframe
+            title="Location Map"
+            width="100%"
+            height="250"
+            style={{ border: 0 }}
+            loading="lazy"
+            allowFullScreen
+            referrerPolicy="no-referrer-when-downgrade"
+            src="https://maps.google.com/maps?q=200-220+May+Street,+Worcester,+MA+01602&t=&z=15&ie=UTF8&iwloc=&output=embed"
+          ></iframe>
+        </div>
       </div>
     </main>
   );
