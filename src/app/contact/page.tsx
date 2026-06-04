@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { submitContactForm } from "@/app/actions/contact";
 
 export default function ContactPage() {
@@ -32,12 +33,23 @@ export default function ContactPage() {
 
   return (
     <main className="flex-1 flex flex-col p-6 items-center justify-center">
-      <div className="w-full max-w-sm space-y-6 mt-12 mb-8">
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Contact Us</h1>
-          <p className="text-black/70">
-            We'd love to hear from you.
-          </p>
+      <div className="w-full max-w-sm space-y-6 mt-8 mb-8">
+        <div className="flex flex-col items-center text-center space-y-4">
+          <div className="relative w-48 h-40 mb-2">
+            <Image 
+              src="/phone-hero.svg" 
+              alt="Person talking on phone" 
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold tracking-tight">Contact Us</h1>
+            <p className="text-black/70">
+              We'd love to hear from you.
+            </p>
+          </div>
         </div>
 
         {message.text && (
