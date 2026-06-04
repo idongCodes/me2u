@@ -1,26 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fdfcfb; /* Soft off-white */
+  --foreground: #000000; /* Black */
+  --skyblue: #0ea5e9; /* Sky blue (Tailwind sky-500) */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-skyblue: var(--skyblue);
+  --font-lora: var(--font-lora-base), serif;
 }
 
 body {
-  background: var(--background);
+  /* Inherits from the RootLayout utility classes, but setting safe fallbacks */
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-lora-base), serif;
 }
