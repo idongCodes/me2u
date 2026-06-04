@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Lora } from "next/font/google";
 import "./globals.css";
+import HeaderBrand from "@/components/HeaderBrand";
 
 const lora = Lora({
   variable: "--font-lora-base",
@@ -26,6 +27,7 @@ export default function RootLayout({
       */}
       <body className="min-h-screen bg-gray-100 flex justify-center font-lora text-foreground selection:bg-skyblue selection:text-white">
         <div className="w-full max-w-md min-h-screen bg-background shadow-xl flex flex-col relative">
+          <HeaderBrand />
           {children}
           <footer className="p-4 text-center text-xs text-black/50 mt-auto">
             &copy; {new Date().getFullYear()} From Me 2 U. All rights reserved.<br />
