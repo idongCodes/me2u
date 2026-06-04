@@ -42,7 +42,7 @@ export default function HeaderBrand() {
       {/* Dropdown Menu */}
       <div 
         className={`absolute top-full left-0 w-full bg-white/95 backdrop-blur-md border-b border-gray-100/50 shadow-md flex flex-col overflow-hidden transition-all duration-300 ease-in-out ${
-          isMenuOpen ? "max-h-48 opacity-100" : "max-h-0 opacity-0 border-transparent"
+          isMenuOpen ? "max-h-64 opacity-100" : "max-h-0 opacity-0 border-transparent"
         }`}
       >
         <Link
@@ -51,6 +51,13 @@ export default function HeaderBrand() {
           onClick={() => setIsMenuOpen(false)}
         >
           About Us
+        </Link>
+        <Link
+          href="/shop"
+          className="px-6 py-4 border-b border-gray-100/50 text-black/80 hover:bg-gray-50 hover:text-skyblue transition-colors font-medium"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          Shop
         </Link>
         <Link
           href="/contact"
