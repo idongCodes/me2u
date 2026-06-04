@@ -10,8 +10,34 @@ const lora = Lora({
 });
 
 export const metadata: Metadata = {
-  title: "From Me 2 U",
-  description: "A mobile-first web app",
+  title: "FromMe2U",
+  description: "A custom digital shop in Worcester, MA, showcasing and selling gently used baby and toddler clothes, strollers, cribs, and more from a smoke-free, pet-free home.",
+  icons: {
+    icon: "/shopping.svg",
+    apple: "/shopping.svg",
+  },
+  openGraph: {
+    title: "FromMe2U",
+    description: "A custom digital shop in Worcester, MA, showcasing and selling gently used baby and toddler clothes, strollers, cribs, and more from a smoke-free, pet-free home.",
+    url: "https://fromme2u.app",
+    siteName: "FromMe2U",
+    images: [
+      {
+        url: "/shopping.svg",
+        width: 800,
+        height: 600,
+        alt: "FromMe2U Shopping",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "FromMe2U",
+    description: "Shop for gently used baby clothes, strollers, and more in Worcester, MA.",
+    images: ["/shopping.svg"],
+  },
 };
 
 export default function RootLayout({
