@@ -1,6 +1,7 @@
 'use server';
 
 import { cookies } from 'next/headers';
+import { revalidatePath } from 'next/cache';
 import connectToDatabase from '@/lib/mongodb';
 import AdminCode from '@/models/AdminCode';
 import { createSession } from '@/lib/auth';
@@ -96,8 +97,14 @@ export async function verifyMfaCode(prevState: unknown, formData: FormData) {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
-    maxAge: 60 * 60 * 24, // 1 day
+    // maxAge omitted to create a session cookie that expires when the browser is closed
   });
 
   return { success: true, verified: true };
+}
+
+export async function logout() {
+  const cookieStore = await cookies();
+  cookieStore.delete('admin_session');
+  revalidatePath('/', 'layout');
 }
