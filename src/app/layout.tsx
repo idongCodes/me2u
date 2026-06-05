@@ -62,7 +62,7 @@ export default async function RootLayout({
       */}
       <body className="min-h-screen bg-gray-100 flex justify-center font-lora text-foreground selection:bg-skyblue selection:text-white">
         <div className="w-full max-w-md min-h-screen bg-background shadow-xl flex flex-col relative">
-          <HeaderBrand />
+          <HeaderBrand isLoggedIn={isLoggedIn} />
           {children}
           <footer className="p-4 text-center text-xs text-black/50 mt-auto flex flex-col items-center gap-3">
             <div>
