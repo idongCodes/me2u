@@ -7,7 +7,7 @@ export async function createSession(payload: { [key: string]: unknown }) {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
-    .setExpirationTime('1d') // Session valid for 1 day
+    .setExpirationTime('12h') // Session valid for 12 hours
     .sign(encodedKey);
 }
 

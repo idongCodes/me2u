@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import { verifySession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+import Inbox from './components/Inbox';
 
 export const metadata = {
   title: 'Admin Dashboard',
@@ -23,10 +24,8 @@ export default async function AdminPage() {
           Welcome to the protected admin area. Access granted via MFA.
         </p>
         
-        {/* Empty admin page as requested */}
-        <div className="border-4 border-dashed border-gray-200 dark:border-gray-800 rounded-xl h-64 flex items-center justify-center">
-          <p className="text-gray-500">Admin content goes here</p>
-        </div>
+        {/* Inbox Section */}
+        <Inbox />
       </div>
     </div>
   );
