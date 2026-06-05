@@ -2,6 +2,8 @@
 
 import { Resend } from "resend";
 import { ContactFormEmail } from "@/emails/ContactFormEmail";
+import connectToDatabase from "@/lib/mongodb";
+import ContactMessage from "@/models/ContactMessage";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -17,6 +19,16 @@ export async function submitContactForm(formData: FormData) {
   }
 
   try {
+    // Save to database
+    await connectToDatabase();
+    await ContactMessage.create({
+      senderName: name,
+      senderEmail: email,
+      senderPhone: phone,
+      subject: subject || "No Subject",
+      body: message,
+    });
+
     const { error } = await resend.emails.send({
       from: "From Me 2 U App <hello@fromme2u.app>",
       to: ["i.d.essien@gmail.com"], // Fixed typo in gmail

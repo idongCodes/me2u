@@ -3,7 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 
-export default function HeaderBrand() {
+interface HeaderBrandProps {
+  isLoggedIn?: boolean;
+}
+
+export default function HeaderBrand({ isLoggedIn = false }: HeaderBrandProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -61,11 +65,20 @@ export default function HeaderBrand() {
         </Link>
         <Link
           href="/contact"
-          className="px-6 py-4 text-black/80 hover:bg-gray-50 hover:text-skyblue transition-colors font-medium"
+          className="px-6 py-4 border-b border-gray-100/50 text-black/80 hover:bg-gray-50 hover:text-skyblue transition-colors font-medium"
           onClick={() => setIsMenuOpen(false)}
         >
           Contact Us
         </Link>
+        {isLoggedIn && (
+          <Link
+            href="/admin"
+            className="px-6 py-4 text-skyblue/90 hover:bg-gray-50 hover:text-skyblue transition-colors font-semibold"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Dashboard
+          </Link>
+        )}
       </div>
     </div>
   );

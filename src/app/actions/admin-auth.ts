@@ -97,6 +97,7 @@ export async function verifyMfaCode(prevState: unknown, formData: FormData) {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
+    domain: process.env.NODE_ENV === 'production' ? '.fromme2u.app' : undefined,
     // maxAge omitted to create a session cookie that expires when the browser is closed
   });
 
@@ -105,6 +106,10 @@ export async function verifyMfaCode(prevState: unknown, formData: FormData) {
 
 export async function logout() {
   const cookieStore = await cookies();
-  cookieStore.delete('admin_session');
+  cookieStore.delete({
+    name: 'admin_session',
+    domain: process.env.NODE_ENV === 'production' ? '.fromme2u.app' : undefined,
+    path: '/',
+  });
   revalidatePath('/', 'layout');
 }
