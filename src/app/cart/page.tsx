@@ -1,11 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/components/CartProvider";
+import ReservationModal from "@/components/ReservationModal";
 
 export default function CartPage() {
   const { items, removeItem, totalPrice } = useCart();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   if (items.length === 0) {
     return (
@@ -19,7 +22,7 @@ export default function CartPage() {
             </svg>
           </div>
           <h1 className="text-2xl font-bold tracking-tight">Your cart is empty</h1>
-          <p className="text-black/60">Looks like you haven't added any items to your cart yet.</p>
+          <p className="text-black/60">Looks like you haven&apos;t added any items to your cart yet.</p>
           <Link 
             href="/shop"
             className="mt-4 w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-skyblue hover:text-black transition-colors active:scale-95 shadow-md flex items-center justify-center"
@@ -90,7 +93,10 @@ export default function CartPage() {
           </div>
 
           <div className="mt-6 space-y-3">
-            <button className="w-full bg-black text-white py-3.5 rounded-lg font-medium hover:bg-skyblue hover:text-black transition-colors active:scale-95 shadow-md">
+            <button 
+              onClick={() => setIsModalOpen(true)}
+              className="w-full bg-black text-white py-3.5 rounded-lg font-medium hover:bg-skyblue hover:text-black transition-colors active:scale-95 shadow-md"
+            >
               Reserve Items
             </button>
             <p className="text-[11px] text-center text-red-500 px-2 font-medium">
@@ -100,6 +106,7 @@ export default function CartPage() {
         </div>
 
       </div>
+      <ReservationModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </main>
   );
 }
