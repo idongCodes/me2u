@@ -31,3 +31,17 @@ export async function deleteMessage(id: string) {
   await ContactMessage.findByIdAndDelete(id);
   revalidatePath('/admin');
 }
+
+export async function adminBulkUpdateMessageStatus(ids: string[], status: 'read' | 'unread' | 'archived' | 'spam' | 'trash') {
+  await connectToDatabase();
+  await ContactMessage.updateMany({ _id: { $in: ids } }, { status });
+  revalidatePath('/admin');
+  return { success: true };
+}
+
+export async function adminBulkDeleteMessages(ids: string[]) {
+  await connectToDatabase();
+  const result = await ContactMessage.deleteMany({ _id: { $in: ids } });
+  revalidatePath('/admin');
+  return { success: true, deletedCount: result.deletedCount };
+}
