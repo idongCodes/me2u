@@ -20,7 +20,6 @@ export default function ReservationModal({ isOpen, onClose }: ReservationModalPr
   const [phone, setPhone] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
-  const [wantsSms, setWantsSms] = useState(false);
   const [wantsEmail, setWantsEmail] = useState(false);
   
   // Data State
@@ -65,9 +64,7 @@ export default function ReservationModal({ isOpen, onClose }: ReservationModalPr
 
     // Calculate final optIn string
     let finalOptIn: "sms" | "email" | "both" | "none" = "none";
-    if (wantsSms && wantsEmail) finalOptIn = "both";
-    else if (wantsSms) finalOptIn = "sms";
-    else if (wantsEmail) finalOptIn = "email";
+    if (wantsEmail) finalOptIn = "email";
 
     try {
       const result = await createReservation({
@@ -212,15 +209,6 @@ export default function ReservationModal({ isOpen, onClose }: ReservationModalPr
                 <div className="pt-2">
                   <span className="block text-sm font-medium text-gray-700 mb-2">Notification Preferences</span>
                   <div className="space-y-2">
-                    <label className="flex items-center space-x-2">
-                      <input 
-                        type="checkbox" 
-                        checked={wantsSms}
-                        onChange={(e) => setWantsSms(e.target.checked)}
-                        className="rounded border-gray-300 text-black focus:ring-black"
-                      />
-                      <span className="text-sm text-gray-600">Receive SMS confirmation</span>
-                    </label>
                     <label className="flex items-center space-x-2">
                       <input 
                         type="checkbox" 
