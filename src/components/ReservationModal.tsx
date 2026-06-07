@@ -88,20 +88,6 @@ export default function ReservationModal({ isOpen, onClose }: ReservationModalPr
     }
   };
 
-  const handleOptInChange = (type: "sms" | "email") => {
-    if (type === "sms") {
-      if (optIn === "email") setOptIn("both");
-      else if (optIn === "both") setOptIn("email");
-      else if (optIn === "none") setOptIn("sms");
-      else if (optIn === "sms") setOptIn("none");
-    } else {
-      if (optIn === "sms") setOptIn("both");
-      else if (optIn === "both") setOptIn("sms");
-      else if (optIn === "none") setOptIn("email");
-      else if (optIn === "email") setOptIn("none");
-    }
-  };
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
@@ -222,8 +208,8 @@ export default function ReservationModal({ isOpen, onClose }: ReservationModalPr
                     <label className="flex items-center space-x-2">
                       <input 
                         type="checkbox" 
-                        checked={optIn === "sms" || optIn === "both"}
-                        onChange={() => handleOptInChange("sms")}
+                        checked={wantsSms}
+                        onChange={(e) => setWantsSms(e.target.checked)}
                         className="rounded border-gray-300 text-black focus:ring-black"
                       />
                       <span className="text-sm text-gray-600">Receive SMS confirmation</span>
@@ -231,8 +217,8 @@ export default function ReservationModal({ isOpen, onClose }: ReservationModalPr
                     <label className="flex items-center space-x-2">
                       <input 
                         type="checkbox" 
-                        checked={optIn === "email" || optIn === "both"}
-                        onChange={() => handleOptInChange("email")}
+                        checked={wantsEmail}
+                        onChange={(e) => setWantsEmail(e.target.checked)}
                         className="rounded border-gray-300 text-black focus:ring-black"
                       />
                       <span className="text-sm text-gray-600">Receive Email confirmation</span>
@@ -244,6 +230,29 @@ export default function ReservationModal({ isOpen, onClose }: ReservationModalPr
 
               {/* Footer / Submit */}
               <div className="pt-4 mt-4 border-t border-gray-100">
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-skyblue hover:text-black transition-colors flex items-center justify-center disabled:opacity-70 disabled:hover:bg-black disabled:hover:text-white"
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 size={20} className="animate-spin mr-2" />
+                      Processing...
+                    </>
+                  ) : (
+                    "Confirm Reservation"
+                  )}
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+4 border-t border-gray-100">
                 <button
                   type="submit"
                   disabled={submitting}
