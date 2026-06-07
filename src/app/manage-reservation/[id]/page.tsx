@@ -4,8 +4,8 @@ import React, { useState, useEffect } from "react";
 import { use } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getReservationForEdit, updateReservation, cancelReservation, getAvailableTimes } from "@/app/actions/reservation";
-import { SHOP_ITEMS, ShopItem } from "@/lib/items";
-import { CheckCircle2, Loader2, X, Plus, Trash2, Calendar, AlertCircle, ShoppingBag, Clock } from "lucide-react";
+import { getAvailableShopItems } from "@/app/actions/shop-items";
+import { CheckCircle2, Loader2, X, Plus, Trash2, Calendar, AlertCircle, ShoppingBag, Clock, Tag } from "lucide-react";
 import { useModal } from "@/components/ModalProvider";
 import Link from "next/link";
 import Image from "next/image";
@@ -30,6 +30,7 @@ export default function ManageReservationPage({ params }: PageProps) {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [items, setItems] = useState<any[]>([]);
+  const [shopItems, setShopItems] = useState<any[]>([]);
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
   const [loadingTimes, setLoadingTimes] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -63,6 +64,18 @@ export default function ManageReservationPage({ params }: PageProps) {
 
     fetchReservation();
   }, [id, token]);
+
+  useEffect(() => {
+    const fetchShopItems = async () => {
+      try {
+        const data = await getAvailableShopItems();
+        setShopItems(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchShopItems();
+  }, []);
 
   // Countdown Timer Logic
   useEffect(() => {
@@ -182,10 +195,10 @@ export default function ManageReservationPage({ params }: PageProps) {
   const canEdit = editTimeLeft !== null && editTimeLeft > 0 && reservation.editCount < 2;
   const canCancel = cancelTimeLeft !== null && cancelTimeLeft > 0;
 
-  const addItemToRes = (item: ShopItem) => {
+  const addItemToRes = (item: any) => {
     if (!canEdit) return;
-    if (items.some(i => i.id === item.id)) return;
-    setItems([...items, { id: item.id, name: item.name, price: item.price }]);
+    if (items.some(i => i.id === item._id)) return;
+    setItems([...items, { id: item._id, name: item.name, price: item.price }]);
   };
 
   const removeItemFromRes = (index: number) => {
@@ -338,7 +351,7 @@ export default function ManageReservationPage({ params }: PageProps) {
             {items.length > 0 ? items.map((item, idx) => (
               <div key={idx} className="bg-white p-3 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-3 animate-in fade-in zoom-in-95 duration-200">
                 <div className="w-12 h-12 bg-gray-50 rounded-xl relative overflow-hidden flex-shrink-0">
-                  <Image src={SHOP_ITEMS.find(si => si.id === item.id)?.images[0] || '/shopping.svg'} alt={item.name} fill className="object-contain p-1.5" />
+                  <Image src={shopItems.find(si => si._id === item.id)?.images[0] || '/shopping.svg'} alt={item.name} fill className="object-contain p-1.5" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold truncate">{item.name}</p>
@@ -368,14 +381,20 @@ export default function ManageReservationPage({ params }: PageProps) {
           </div>
           
           <div className="flex overflow-x-auto gap-3 pb-2 -mx-2 px-2 snap-x [&::-webkit-scrollbar]:hidden">
-            {SHOP_ITEMS.map(item => (
+            {shopItems.map(item => (
               <button
-                key={item.id}
+                key={item._id}
                 onClick={() => addItemToRes(item)}
                 className="w-32 flex-shrink-0 snap-start bg-white p-3 rounded-2xl border border-gray-100 shadow-sm active:scale-95 transition-transform text-left space-y-2"
               >
                 <div className="w-full aspect-square bg-gray-50 rounded-xl relative overflow-hidden">
-                   <Image src={item.images[0]} alt={item.name} fill className="object-contain p-2" />
+                   {item.images.length > 0 ? (
+                     <Image src={item.images[0]} alt={item.name} fill className="object-contain p-2" />
+                   ) : (
+                     <div className="w-full h-full flex items-center justify-center">
+                        <Tag size={20} className="text-gray-200" />
+                     </div>
+                   )}
                 </div>
                 <div className="min-w-0">
                   <p className="text-[10px] font-bold truncate leading-tight">{item.name}</p>
