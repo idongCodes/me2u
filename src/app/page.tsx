@@ -182,6 +182,33 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Map Section */}
+      <section className="w-full p-6 py-16 bg-gray-50/50 border-t border-gray-100">
+        <div className="max-w-md mx-auto space-y-8">
+          <div className="text-center space-y-2">
+            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Our Location</h2>
+            <p className="text-2xl font-black tracking-tight text-gray-900 leading-tight">Serving Worcester County</p>
+          </div>
+          
+          <div className="w-full rounded-3xl overflow-hidden border border-gray-200 shadow-lg bg-white animate-in fade-in zoom-in duration-700">
+            <iframe
+              title="Location Map"
+              width="100%"
+              height="300"
+              style={{ border: 0 }}
+              loading="lazy"
+              allowFullScreen
+              referrerPolicy="no-referrer-when-downgrade"
+              src="https://maps.google.com/maps?q=200-220+May+Street,+Worcester,+MA+01602&t=&z=15&ie=UTF8&iwloc=&output=embed"
+            ></iframe>
+          </div>
+          
+          <p className="text-center text-gray-500 text-sm font-medium leading-relaxed">
+            We are locally based in Worcester, MA, providing safe and convenient pickups for all our neighbors.
+          </p>
+        </div>
+      </section>
+
       <LeaveTestimonialModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
