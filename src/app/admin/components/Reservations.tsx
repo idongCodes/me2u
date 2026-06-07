@@ -81,7 +81,7 @@ export default function Reservations() {
         modal.alert({
           type: "danger",
           title: "Error",
-          message: result.error || "Failed to cancel reservation."
+          message: (result as any).error || "Failed to cancel reservation."
         });
       }
     } catch (err) {
@@ -119,7 +119,7 @@ export default function Reservations() {
         modal.alert({
           type: "danger",
           title: "Error",
-          message: result.error || "Failed to delete reservation."
+          message: (result as any).error || "Failed to delete reservation."
         });
       }
     } catch (err) {
