@@ -89,10 +89,10 @@ export default function ShopPage() {
 
   return (
     <main className="flex-1 flex flex-col p-6 items-center">
-      <div className="w-full max-w-2xl flex flex-col items-center gap-6 mt-8">
+      <div className="w-full max-w-5xl flex flex-col items-center gap-6 mt-8">
         
         {/* Hero Section */}
-        <div className="w-full relative flex flex-col items-center text-center space-y-4">
+        <div className="w-full relative flex flex-col items-center text-center space-y-4 max-w-2xl mx-auto">
           <div className="relative w-48 h-48 mb-2">
             <Image 
               src="/undraw_online-shopping_po8w.svg" 

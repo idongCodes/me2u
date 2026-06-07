@@ -115,13 +115,13 @@ export default function Home() {
 
       {/* Benefits Section */}
       <section className="w-full bg-gray-50/50 p-6 py-16 border-y border-gray-100">
-        <div className="max-w-md mx-auto space-y-12">
+        <div className="max-w-5xl mx-auto space-y-12">
           <div className="text-center space-y-2">
             <h2 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Why Shop With Us?</h2>
             <p className="text-2xl font-black tracking-tight text-gray-900">Better for you, better for the neighborhood.</p>
           </div>
 
-          <div className="grid grid-cols-1 gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
             {benefits.map((benefit, idx) => (
               <div key={idx} className="flex gap-5 items-start">
                 <div className="flex-shrink-0 p-3 bg-white rounded-2xl shadow-sm border border-gray-100">
@@ -141,7 +141,7 @@ export default function Home() {
 
       {/* Testimonials Section */}
       <section className="w-full p-6 py-16 bg-white overflow-hidden">
-        <div className="max-w-md mx-auto space-y-10">
+        <div className="max-w-5xl mx-auto space-y-10">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div className="space-y-2 text-center sm:text-left">
               <h2 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Neighborhood Love</h2>
@@ -156,7 +156,7 @@ export default function Home() {
             </button>
           </div>
 
-          <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Hardcoded Testimonial (Jessica S.) */}
             <div className="bg-gray-50 p-8 rounded-3xl relative border border-gray-100 shadow-sm animate-in fade-in duration-700">
               <div className="absolute -top-4 left-8 text-6xl text-skyblue opacity-20 font-serif leading-none">&ldquo;</div>
@@ -209,16 +209,22 @@ export default function Home() {
       </section>
 
       {/* Contact Section */}
-      <section className="w-full p-6 py-16 bg-white">
-        <div className="max-w-md mx-auto space-y-8">
-          <div className="text-center space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight">Contact <span className="text-skyblue">FM2U</span></h2>
-            <p className="text-gray-500 text-sm font-medium leading-relaxed">
-              Contact <span className="text-skyblue font-bold">FM2U</span> for help or inquiries.
-            </p>
+      <section className="w-full p-6 py-16 bg-white border-t border-gray-100">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div className="space-y-6 text-center md:text-left">
+            <div className="space-y-2">
+              <h2 className="text-3xl font-bold tracking-tight">Contact <span className="text-skyblue">FM2U</span></h2>
+              <p className="text-gray-500 text-sm font-medium leading-relaxed max-w-sm mx-auto md:mx-0">
+                Contact <span className="text-skyblue font-bold">FM2U</span> for help or inquiries.
+              </p>
+            </div>
+            
+            <div className="hidden md:block relative w-full aspect-square max-w-xs">
+              <Image src="/phone-hero.svg" alt="Contact illustration" fill className="object-contain" />
+            </div>
           </div>
 
-          <form onSubmit={handleContactSubmit} className="space-y-4">
+          <form onSubmit={handleContactSubmit} className="space-y-4 bg-gray-50/50 p-8 rounded-3xl border border-gray-100 shadow-sm">
             {contactMessage.text && (
               <div className={`p-4 rounded-2xl text-sm font-bold border animate-in fade-in slide-in-from-top-2 ${
                 contactMessage.type === 'error' ? 'bg-red-50 text-red-600 border-red-100' : 'bg-green-50 text-green-600 border-green-100'
@@ -235,7 +241,7 @@ export default function Home() {
                   id="home-name"
                   name="name"
                   type="text" 
-                  className="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-skyblue outline-none text-sm font-bold"
+                  className="w-full p-4 bg-white border border-gray-100 rounded-2xl focus:ring-2 focus:ring-skyblue outline-none text-sm font-bold shadow-sm"
                   placeholder="John Doe"
                 />
               </div>
@@ -247,7 +253,7 @@ export default function Home() {
                   id="home-email"
                   name="email"
                   type="email" 
-                  className="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-skyblue outline-none text-sm font-bold"
+                  className="w-full p-4 bg-white border border-gray-100 rounded-2xl focus:ring-2 focus:ring-skyblue outline-none text-sm font-bold shadow-sm"
                   placeholder="john@example.com"
                 />
               </div>
@@ -259,7 +265,7 @@ export default function Home() {
                   id="home-message"
                   name="message"
                   rows={4}
-                  className="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-skyblue outline-none text-sm font-medium resize-none leading-relaxed"
+                  className="w-full p-4 bg-white border border-gray-100 rounded-2xl focus:ring-2 focus:ring-skyblue outline-none text-sm font-medium resize-none leading-relaxed shadow-sm"
                   placeholder="How can we help?"
                 />
               </div>
@@ -284,18 +290,18 @@ export default function Home() {
       </section>
 
       {/* Map Section */}
-      <section className="w-full p-6 py-16 bg-gray-50/50 border-t border-gray-100">
-        <div className="max-w-md mx-auto space-y-8">
+      <section className="w-full p-6 py-16 bg-gray-100/50 border-t border-gray-100">
+        <div className="max-w-5xl mx-auto space-y-8">
           <div className="text-center space-y-2">
             <h2 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Our Location</h2>
             <p className="text-2xl font-black tracking-tight text-gray-900 leading-tight">Serving Worcester County</p>
           </div>
           
-          <div className="w-full rounded-3xl overflow-hidden border border-gray-200 shadow-lg bg-white animate-in fade-in zoom-in duration-700">
+          <div className="w-full h-[400px] rounded-3xl overflow-hidden border border-gray-200 shadow-2xl bg-white animate-in fade-in zoom-in duration-700">
             <iframe
               title="Location Map"
               width="100%"
-              height="300"
+              height="100%"
               style={{ border: 0 }}
               loading="lazy"
               allowFullScreen
@@ -304,7 +310,7 @@ export default function Home() {
             ></iframe>
           </div>
           
-          <p className="text-center text-gray-500 text-sm font-medium leading-relaxed">
+          <p className="text-center text-gray-500 text-sm font-medium leading-relaxed max-w-sm mx-auto">
             We are locally based in Worcester, MA, providing safe and convenient pickups for all our neighbors.
           </p>
         </div>
