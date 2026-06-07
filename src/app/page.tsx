@@ -82,6 +82,36 @@ export default function Home() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="w-full p-6 py-16 bg-white">
+        <div className="max-w-md mx-auto space-y-8">
+          <div className="text-center space-y-2">
+            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Neighborhood Love</h2>
+            <p className="text-2xl font-black tracking-tight text-gray-900">What your neighbors are saying.</p>
+          </div>
+
+          <div className="bg-gray-50 p-8 rounded-3xl relative">
+            <div className="absolute -top-4 left-8 text-6xl text-skyblue opacity-20 font-serif leading-none">
+              &ldquo;
+            </div>
+            <div className="space-y-4 relative z-10">
+              <p className="text-gray-700 font-medium leading-relaxed italic">
+                &quot;I found the most beautiful crib for my son here! The process was so easy, and knowing it came from a clean, smoke-free home meant the world to me. Pickup was a breeze!&quot;
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-skyblue/10 rounded-full flex items-center justify-center text-skyblue font-black text-xs">
+                  JS
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-gray-900">Jessica S.</p>
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Worcester Neighbor</p>
+                </div>
+              </div>
+            </div>
+          </div>
 
           <div className="pt-8">
             <Link 
