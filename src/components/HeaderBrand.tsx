@@ -62,14 +62,14 @@ export default function HeaderBrand({ isLoggedIn = false }: HeaderBrandProps) {
           className="px-6 py-4 border-b border-gray-100/50 text-black/80 hover:bg-gray-50 hover:text-skyblue transition-colors font-medium"
           onClick={() => setIsMenuOpen(false)}
         >
-          About Us
+          About <span className="text-skyblue">FM2U</span>
         </Link>
         <Link
           href="/shop"
           className="px-6 py-4 border-b border-gray-100/50 text-black/80 hover:bg-gray-50 hover:text-skyblue transition-colors font-medium"
           onClick={() => setIsMenuOpen(false)}
         >
-          Shop
+          Shop <span className="text-skyblue">FM2U</span>
         </Link>
         <Link
           href="/contact"
