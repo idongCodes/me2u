@@ -127,6 +127,7 @@ export default function ManageReservationPage({ params }: PageProps) {
   };
 
   const addItemToRes = (item: ShopItem) => {
+    if (items.some(i => i.id === item.id)) return;
     setItems([...items, { id: item.id, name: item.name, price: item.price }]);
   };
 
@@ -188,9 +189,15 @@ export default function ManageReservationPage({ params }: PageProps) {
       <div className="bg-white px-6 pt-8 pb-6 border-b border-gray-100 shadow-sm">
         <div className="w-full max-w-lg mx-auto space-y-2">
           <h1 className="text-2xl font-black tracking-tight text-gray-900">Manage Booking</h1>
-          <div className="flex items-center gap-2 text-xs font-bold text-red-500 bg-red-50 px-3 py-1.5 rounded-full w-fit">
-            <Clock size={12} />
-            <span>15-MINUTE EDITING WINDOW ACTIVE</span>
+          <div className="flex flex-wrap gap-2">
+            <div className="flex items-center gap-2 text-[10px] font-black text-red-500 bg-red-50 px-3 py-1.5 rounded-full w-fit uppercase">
+              <Clock size={12} />
+              <span>15-Min Window</span>
+            </div>
+            <div className="flex items-center gap-2 text-[10px] font-black text-skyblue bg-skyblue/5 px-3 py-1.5 rounded-full w-fit uppercase">
+              <AlertCircle size={12} />
+              <span>{2 - reservation.editCount} Edits Left</span>
+            </div>
           </div>
           <p className="text-gray-500 text-sm font-medium pt-1">
             Hi <span className="text-black font-bold">{reservation.name}</span>, you can modify your reservation details below.

@@ -15,6 +15,7 @@ export interface IReservation extends Document {
   totalPrice: number;
   status: "pending" | "confirmed" | "cancelled";
   editToken: string;
+  editCount: number;
   createdAt: Date;
 }
 
@@ -40,6 +41,7 @@ const ReservationSchema: Schema = new Schema(
       default: "pending",
     },
     editToken: { type: String, required: true },
+    editCount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

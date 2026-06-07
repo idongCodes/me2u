@@ -129,6 +129,11 @@ export async function getReservationForEdit(id: string, token: string) {
     return { success: false, error: "The 15-minute window for editing this reservation has passed." };
   }
 
+  // Check edit count limit (max 2 edits)
+  if (reservation.editCount >= 2) {
+    return { success: false, error: "You have reached the maximum of 2 modifications for this reservation." };
+  }
+
   return { success: true, reservation: JSON.parse(JSON.stringify(reservation)) };
 }
 
@@ -152,6 +157,11 @@ export async function updateReservation(id: string, token: string, data: {
     return { success: false, error: "The 15-minute window for editing this reservation has passed." };
   }
 
+  // Check edit count limit
+  if (reservation.editCount >= 2) {
+    return { success: false, error: "You have reached the maximum of 2 modifications for this reservation." };
+  }
+
   // Validate time availability (excluding current reservation)
   const existing = await Reservation.findOne({ 
     date: data.date, 
@@ -162,9 +172,14 @@ export async function updateReservation(id: string, token: string, data: {
     return { success: false, error: "This time slot is no longer available. Please select another time." };
   }
 
-  await Reservation.updateOne({ _id: id }, { ...data, status: "pending" });
-
-  // Optional: Send update notifications here if desired
+  await Reservation.updateOne(
+    { _id: id }, 
+    { 
+      ...data, 
+      status: "pending",
+      $inc: { editCount: 1 }
+    }
+  );
 
   return { success: true };
 }
