@@ -37,9 +37,20 @@ export default function CartPage() {
   return (
     <main className="flex-1 flex flex-col p-6 items-center">
       <div className="w-full max-w-2xl flex flex-col gap-6 mt-4">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight">Your Cart</h1>
-          <p className="text-sm text-black/60">Review your items before reserving.</p>
+        <div className="flex justify-between items-end">
+          <div className="space-y-1">
+            <h1 className="text-2xl font-bold tracking-tight">Your Cart</h1>
+            <p className="text-sm text-black/60">Review your items before reserving.</p>
+          </div>
+          <Link 
+            href="/shop" 
+            className="text-xs font-bold text-skyblue hover:underline mb-1 flex items-center gap-1 uppercase tracking-wider"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m15 18-6-6 6-6"/>
+            </svg>
+            Continue Shopping
+          </Link>
         </div>
 
         {/* Cart Items List */}
@@ -99,6 +110,12 @@ export default function CartPage() {
             >
               Reserve Items
             </button>
+            <Link 
+              href="/shop"
+              className="w-full bg-white border border-gray-200 text-black py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors active:scale-95 flex items-center justify-center gap-2 text-sm"
+            >
+              Continue Shopping
+            </Link>
             <p className="text-[11px] text-center text-red-500 px-2 font-medium">
               Payment is cash only. Reserving items puts them on hold for you to inspect and purchase in person.
             </p>
