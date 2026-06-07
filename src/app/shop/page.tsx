@@ -121,13 +121,13 @@ export default function ShopPage() {
                   </div>
                   
                   {/* Item Details */}
-                  <div className="p-3 flex flex-col flex-1 gap-1">
-                    <div className="flex justify-between items-start gap-1">
-                      <h3 className="font-semibold text-sm text-gray-900 leading-tight line-clamp-1">{item.name}</h3>
-                      <span className="font-bold text-skyblue text-sm whitespace-nowrap">${item.price}</span>
+                  <div className="p-5 flex flex-col flex-1 gap-2">
+                    <div className="flex justify-between items-start gap-4">
+                      <h3 className="font-bold text-lg text-gray-900 leading-tight">{item.name}</h3>
+                      <span className="font-black text-skyblue text-lg whitespace-nowrap">${item.price}</span>
                     </div>
                     
-                    <p className="text-[10px] text-gray-600 line-clamp-2 leading-snug h-[2.4em]">
+                    <p className="text-sm text-gray-600 leading-relaxed">
                       {item.description}
                     </p>
                     

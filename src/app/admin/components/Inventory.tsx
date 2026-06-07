@@ -277,13 +277,13 @@ export default function Inventory() {
                 </button>
               </div>
 
-              <div className="p-5 flex-1 flex flex-col space-y-4">
-                <div className="flex justify-between items-start gap-2">
-                  <h3 className="font-bold text-gray-900 dark:text-white leading-tight line-clamp-1">{item.name}</h3>
-                  <span className="text-skyblue font-black tracking-tight">${item.price}</span>
+              <div className="p-6 flex-1 flex flex-col space-y-4">
+                <div className="flex justify-between items-start gap-4">
+                  <h3 className="font-black text-lg text-gray-900 dark:text-white leading-tight">{item.name}</h3>
+                  <span className="text-skyblue font-black tracking-tight text-lg">${item.price}</span>
                 </div>
                 
-                <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed">
+                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
                   {item.description}
                 </p>
 
