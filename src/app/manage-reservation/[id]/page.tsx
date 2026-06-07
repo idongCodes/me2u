@@ -53,9 +53,19 @@ export default function ManageReservationPage({ params }: PageProps) {
           setTime(result.reservation.time);
           setItems(result.reservation.items);
         } else {
+          modal.alert({
+            type: "warning",
+            title: "Access Denied",
+            message: result.error || "Reservation not found or link has expired."
+          });
           setError(result.error || "Failed to load reservation.");
         }
       } catch (err) {
+        modal.alert({
+          type: "danger",
+          title: "System Error",
+          message: "Failed to load reservation details."
+        });
         setError("An unexpected error occurred.");
       } finally {
         setLoading(false);
@@ -140,7 +150,11 @@ export default function ManageReservationPage({ params }: PageProps) {
 
   const handleUpdate = async () => {
     if (!date || !time || items.length === 0) {
-      setError("Please ensure date, time, and at least one item are selected.");
+      modal.alert({
+        type: "warning",
+        title: "Missing Info",
+        message: "Please ensure date, time, and at least one item are selected."
+      });
       return;
     }
 
@@ -156,10 +170,18 @@ export default function ManageReservationPage({ params }: PageProps) {
       if (result.success) {
         setStep("success-edit");
       } else {
-        setError(result.error || "Failed to update reservation.");
+        modal.alert({
+          type: "warning",
+          title: "Update Error",
+          message: result.error || "This time slot is no longer available. Please select another time."
+        });
       }
     } catch (err) {
-      setError("An unexpected error occurred.");
+      modal.alert({
+        type: "danger",
+        title: "System Error",
+        message: "An unexpected error occurred while updating your reservation."
+      });
     } finally {
       setSubmitting(false);
     }
@@ -183,10 +205,18 @@ export default function ManageReservationPage({ params }: PageProps) {
       if (result.success) {
         setStep("success-cancel");
       } else {
-        setError(result.error || "Failed to cancel reservation.");
+        modal.alert({
+          type: "warning",
+          title: "Cancellation Error",
+          message: result.error || "Reservations can only be cancelled up to 15 minutes before the scheduled time."
+        });
       }
     } catch (err) {
-      setError("An unexpected error occurred.");
+      modal.alert({
+        type: "danger",
+        title: "System Error",
+        message: "An unexpected error occurred while cancelling your reservation."
+      });
     } finally {
       setSubmitting(false);
     }

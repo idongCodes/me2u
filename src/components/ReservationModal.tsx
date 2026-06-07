@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getAvailableTimes, createReservation } from "@/app/actions/reservation";
 import { useCart } from "@/components/CartProvider";
+import { useModal } from "@/components/ModalProvider";
 import { X, CheckCircle2, Loader2 } from "lucide-react";
 
 interface ReservationModalProps {
@@ -13,6 +14,7 @@ interface ReservationModalProps {
 
 export default function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
   const router = useRouter();
+  const modal = useModal();
   const { items, totalPrice, clearCart } = useCart();
   const [step, setStep] = useState<"form" | "success">("form");
 
@@ -91,11 +93,19 @@ export default function ReservationModal({ isOpen, onClose }: ReservationModalPr
         setStep("success");
         clearCart();
       } else {
-        setError(result.error || "Something went wrong. Please try again.");
+        modal.alert({
+          type: "warning",
+          title: "Reservation Error",
+          message: result.error || "This time slot is no longer available. Please select another time."
+        });
       }
     } catch (err) {
       console.error(err);
-      setError("An unexpected error occurred.");
+      modal.alert({
+        type: "danger",
+        title: "System Error",
+        message: "An unexpected error occurred while processing your reservation."
+      });
     } finally {
       setSubmitting(false);
     }
