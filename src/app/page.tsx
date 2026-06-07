@@ -1,23 +1,37 @@
+import Image from "next/image";
+import Link from "next/link";
+
 export default function Home() {
   return (
     <main className="flex-1 flex flex-col p-6 items-center justify-center text-center">
-      <div className="flex flex-col items-center gap-6">
-        <div className="w-20 h-20 bg-skyblue rounded-full flex items-center justify-center shadow-lg shadow-skyblue/30">
-          <span className="text-white text-3xl font-bold">M2U</span>
-        </div>
+      <div className="flex flex-col items-center gap-6 max-w-sm">
         
+        {/* Hero Illustration */}
+        <div className="relative w-64 h-64 mb-4">
+          <Image 
+            src="/undraw_for-sale_7qjb.svg" 
+            alt="For Sale Illustration" 
+            fill
+            className="object-contain"
+            priority
+          />
+        </div>
+
         <div className="space-y-3">
-          <h1 className="text-3xl font-bold tracking-tight">
-            From Me 2 U
+          <h1 className="text-4xl font-black tracking-tighter">
+            Welcome to <span className="text-skyblue">Me2U</span>
           </h1>
-          <p className="text-black/70 text-lg max-w-xs mx-auto">
-            A beautiful, mobile-optimized experience.
+          <p className="text-black/70 text-lg font-medium leading-tight">
+            Gently used items from one home to another.
           </p>
         </div>
 
-        <button className="mt-8 px-8 py-3 bg-black text-white rounded-full font-medium w-full max-w-xs hover:bg-skyblue hover:text-black transition-colors active:scale-95 shadow-md">
-          Get Started
-        </button>
+        <Link 
+          href="/shop" 
+          className="mt-8 px-10 py-4 bg-black text-white rounded-full font-black text-sm uppercase tracking-widest w-full hover:bg-skyblue hover:text-black transition-all active:scale-95 shadow-xl"
+        >
+          Shop FM2U
+        </Link>
       </div>
     </main>
   );
