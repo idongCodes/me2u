@@ -7,6 +7,7 @@ import twilio from "twilio";
 import crypto from "crypto";
 import { cookies } from 'next/headers';
 import { verifySession } from '@/lib/auth';
+import { generateCalendarLinks } from "@/lib/calendar";
 
 // Generate times from 10:00 to 17:00 in 30-min intervals
 // 15 min block + 15 min buffer = 30 min spacing
@@ -71,8 +72,17 @@ export async function createReservation(data: {
     const itemsList = data.items.map(i => `${i.name} ($${i.price})`).join(", ");
     const manageUrl = `${baseUrl}/manage-reservation/${reservation._id}?token=${reservation.editToken}`;
     
+    // Generate Calendar Links
+    const { googleUrl, icsDataUri } = generateCalendarLinks({
+      title: `Me2U Reservation: ${data.name}`,
+      description: `Reservation at Me2U for ${itemsList}. Total: $${data.totalPrice} (Cash Only).`,
+      location: "212 May St, Worcester, MA 01602",
+      date: data.date,
+      time: data.time
+    });
+
     // --- NOTIFY ADMIN ---
-    const adminNotificationText = `New Reservation from ${data.name} (${data.phone}, ${data.email}) for ${data.date} at ${data.time}.\nItems: ${itemsList}\nTotal: $${data.totalPrice}\nView/Edit: ${manageUrl}`;
+    const adminNotificationText = `New Reservation from ${data.name} (${data.phone}, ${data.email}) for ${data.date} at ${data.time}.\nItems: ${itemsList}\nTotal: $${data.totalPrice}\nView/Edit: ${manageUrl}\n\nAdd to Calendar: ${googleUrl}`;
 
     if (resendApiKey) {
       const resend = new Resend(resendApiKey);
@@ -96,7 +106,7 @@ export async function createReservation(data: {
 
     // --- NOTIFY CUSTOMER ---
     const wantsEmail = data.optIn === "email" || data.optIn === "both";
-    const customerNotificationText = `Hi ${data.name}, your reservation at Me2U for ${data.date} at ${data.time} is confirmed! Total: $${data.totalPrice} (Cash Only).\n\nAddress: 212 May St, Worcester, MA 01602\n\nWe look forward to seeing you.\n\nYou can edit or cancel your reservation within 15 minutes here: ${manageUrl}`;
+    const customerNotificationText = `Hi ${data.name}, your reservation at Me2U for ${data.date} at ${data.time} is confirmed! Total: $${data.totalPrice} (Cash Only).\n\nAddress: 212 May St, Worcester, MA 01602\n\nWe look forward to seeing you.\n\nAdd to Google Calendar: ${googleUrl}\n\nDownload iCal (for Apple/Outlook): ${icsDataUri}\n\nYou can edit or cancel your reservation within 15 minutes here: ${manageUrl}`;
 
     if (wantsEmail && resendApiKey) {
       const resend = new Resend(resendApiKey);
