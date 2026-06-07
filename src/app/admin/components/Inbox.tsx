@@ -299,11 +299,14 @@ export default function Inbox() {
   };
 
   const handleBulkStatusUpdate = async (status: Message['status']) => {
+    const isReadUnread = status === 'read' || status === 'unread';
     const confirmed = await modal.confirm({
       type: status === 'trash' ? 'warning' : 'info',
-      title: `Bulk ${status}`,
-      message: `Are you sure you want to move ${selectedIds.length} messages to ${status}?`,
-      confirmLabel: `Move to ${status}`,
+      title: isReadUnread ? `Mark as ${status}` : `Bulk ${status}`,
+      message: isReadUnread 
+        ? `Mark ${selectedIds.length} messages as ${status}?`
+        : `Are you sure you want to move ${selectedIds.length} messages to ${status}?`,
+      confirmLabel: isReadUnread ? `Mark as ${status}` : `Move to ${status}`,
     });
 
     if (!confirmed) return;
@@ -383,6 +386,22 @@ export default function Inbox() {
         <div className="flex items-center gap-3">
           {selectedIds.length > 0 && (
             <div className="flex items-center gap-2 animate-in slide-in-from-right-2">
+              <button
+                onClick={() => handleBulkStatusUpdate('read')}
+                disabled={bulkLoading}
+                className="p-2 text-gray-500 hover:text-skyblue hover:bg-blue-50 rounded-full transition-colors"
+                title="Mark Selected as Read"
+              >
+                <MailOpen size={20} />
+              </button>
+              <button
+                onClick={() => handleBulkStatusUpdate('unread')}
+                disabled={bulkLoading}
+                className="p-2 text-gray-500 hover:text-skyblue hover:bg-blue-50 rounded-full transition-colors"
+                title="Mark Selected as Unread"
+              >
+                <Mail size={20} />
+              </button>
               <button
                 onClick={() => handleBulkStatusUpdate('archived')}
                 disabled={bulkLoading}
