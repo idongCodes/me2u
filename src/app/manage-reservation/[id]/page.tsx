@@ -197,13 +197,31 @@ export default function ManageReservationPage({ params }: PageProps) {
 
   const addItemToRes = (item: any) => {
     if (!canEdit) return;
-    if (items.some(i => i.id === item._id)) return;
+    if (items.some(i => i.id === item._id)) {
+      modal.alert({
+        type: "warning",
+        title: "Already Added",
+        message: `${item.name} is already in your reservation.`
+      });
+      return;
+    }
     setItems([...items, { id: item._id, name: item.name, price: item.price }]);
+    modal.alert({
+      type: "success",
+      title: "Item Added",
+      message: `${item.name} has been added. Don't forget to Save Changes!`
+    });
   };
 
   const removeItemFromRes = (index: number) => {
     if (!canEdit) return;
+    const removedItem = items[index];
     setItems(items.filter((_, i) => i !== index));
+    modal.alert({
+      type: "info",
+      title: "Removed",
+      message: `${removedItem.name} has been removed from your reservation.`
+    });
   };
 
   if (loading) {
