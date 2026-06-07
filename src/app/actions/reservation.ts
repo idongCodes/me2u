@@ -64,7 +64,7 @@ export async function createReservation(data: {
     if (resendApiKey) {
       const resend = new Resend(resendApiKey);
       const { error } = await resend.emails.send({
-        from: "Me2U Reservations <onboarding@resend.dev>", 
+        from: "Me2U Reservations <hello@fromme2u.app>", 
         to: adminEmail,
         subject: `New Reservation: ${data.name} on ${data.date}`,
         text: adminNotificationText,
@@ -86,6 +86,16 @@ export async function createReservation(data: {
     const wantsSms = data.optIn === "sms" || data.optIn === "both";
     const customerNotificationText = `Hi ${data.name}, your reservation at Me2U for ${data.date} at ${data.time} is confirmed! Total: $${data.totalPrice} (Cash Only). We look forward to seeing you.`;
 
+    // Format phone number to E.164 for Twilio
+    let formattedPhone = data.phone.replace(/\D/g, '');
+    if (formattedPhone.length === 10) {
+      formattedPhone = `+1${formattedPhone}`;
+    } else if (formattedPhone.length === 11 && formattedPhone.startsWith('1')) {
+      formattedPhone = `+${formattedPhone}`;
+    } else if (!formattedPhone.startsWith('+')) {
+      formattedPhone = `+${formattedPhone}`; // Fallback, though might be invalid
+    }
+
     if (wantsEmail && resendApiKey) {
       const resend = new Resend(resendApiKey);
       const { error } = await resend.emails.send({
@@ -97,12 +107,12 @@ export async function createReservation(data: {
       if (error) console.error("Resend Customer Email Error:", error);
     }
 
-    if (wantsSms && twilioSid && twilioAuth && twilioPhone) {
+    if (wantsSms && twilioSid && twilioAuth && twilioPhone && formattedPhone.startsWith('+')) {
       const client = twilio(twilioSid, twilioAuth);
       await client.messages.create({
         body: customerNotificationText,
         from: twilioPhone,
-        to: data.phone,
+        to: formattedPhone,
       }).catch(err => console.error("Twilio Customer SMS Error:", err));
     }
 
