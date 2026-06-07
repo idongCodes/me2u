@@ -51,7 +51,7 @@ export default function CartPage() {
             href="/shop"
             className="mt-4 w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-skyblue hover:text-black transition-colors active:scale-95 shadow-md flex items-center justify-center"
           >
-            Return to Shop
+            Shop <span className="text-skyblue ml-1">FM2U</span>
           </Link>
         </div>
       </main>
@@ -73,7 +73,7 @@ export default function CartPage() {
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
               <path d="m15 18-6-6 6-6"/>
             </svg>
-            Continue Shopping
+            Shop FM2U
           </Link>
         </div>
 
@@ -143,7 +143,7 @@ export default function CartPage() {
               href="/shop"
               className="w-full bg-white border border-gray-200 text-black py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors active:scale-95 flex items-center justify-center gap-2 text-sm"
             >
-              Continue Shopping
+              Shop <span className="text-skyblue font-bold">FM2U</span>
             </Link>
             <p className="text-[11px] text-center text-red-500 px-2 font-medium">
               Payment is cash only. Reserving items puts them on hold for you to inspect and purchase in person.

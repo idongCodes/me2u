@@ -15,7 +15,7 @@ export default function AboutPage() {
           />
         </div>
         <h1 className="text-3xl font-bold tracking-tight">
-          About <span className="text-skyblue">From Me 2 U</span>
+          About <span className="text-skyblue">FM2U</span>
         </h1>
         <div className="text-black/80 text-base max-w-sm space-y-4 text-left leading-relaxed">
           <p>
@@ -36,7 +36,7 @@ export default function AboutPage() {
           href="/shop" 
           className="mt-6 px-8 py-3 bg-black text-white rounded-full font-medium w-full max-w-xs hover:bg-skyblue hover:text-black transition-colors active:scale-95 shadow-md text-center"
         >
-          Enter Shop
+          Shop <span className="text-skyblue">FM2U</span>
         </Link>
       </div>
     </main>

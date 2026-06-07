@@ -272,8 +272,8 @@ export default function ManageReservationPage({ params }: PageProps) {
           <h1 className="text-xl font-bold">Something went wrong</h1>
           <p className="text-gray-500 text-sm max-w-xs mx-auto">{error}</p>
         </div>
-        <Link href="/shop" className="w-full max-w-xs bg-black text-white py-4 rounded-2xl font-bold shadow-md active:scale-95 transition-transform">
-          Return to Shop
+        <Link href="/shop" className="w-full max-w-xs bg-black text-white py-4 rounded-2xl font-bold shadow-md active:scale-95 transition-transform flex items-center justify-center">
+          Shop <span className="text-skyblue ml-1">FM2U</span>
         </Link>
       </main>
     );
@@ -295,8 +295,8 @@ export default function ManageReservationPage({ params }: PageProps) {
               : "Your reservation has been cancelled. All items have been released."}
           </p>
         </div>
-        <Link href="/shop" className="w-full max-w-xs bg-black text-white py-4 rounded-2xl font-bold shadow-md active:scale-95 transition-transform">
-          Return to Shop
+        <Link href="/shop" className="w-full max-w-xs bg-black text-white py-4 rounded-2xl font-bold shadow-md active:scale-95 transition-transform flex items-center justify-center">
+          Shop <span className="text-skyblue ml-1">FM2U</span>
         </Link>
       </main>
     );
