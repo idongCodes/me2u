@@ -13,7 +13,8 @@ import {
   CheckSquare,
   Square,
   MinusSquare,
-  CheckCircle2
+  CheckCircle2,
+  XCircle
 } from 'lucide-react';
 import { 
   getMessages, 
@@ -424,7 +425,7 @@ export default function Inbox() {
                 className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-100 rounded-full transition-colors"
                 title="Delete Selected Forever"
               >
-                <Trash2 size={20} color="red" />
+                <XCircle size={20} className="text-red-600" />
               </button>
               <div className="h-6 w-px bg-gray-200 dark:bg-gray-800 mx-1" />
             </div>
