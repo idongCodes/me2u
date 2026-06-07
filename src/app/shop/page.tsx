@@ -62,9 +62,6 @@ export default function ShopPage() {
             <p className="text-black/70 max-w-sm mx-auto">
               See what is available, add to cart to reserve or view total.
             </p>
-            <p className="text-xs text-red-500 font-medium max-w-sm mx-auto">
-              In an attempt to prevent scammers we do not accept any form of online payments, everything is cash only!
-            </p>
           </div>
         </div>
 
