@@ -8,6 +8,7 @@ import { verifySession } from "@/lib/auth";
 import { logout } from "@/app/actions/admin-auth";
 import { CartProvider } from "@/components/CartProvider";
 import { ModalProvider } from "@/components/ModalProvider";
+import { ToastProvider } from "@/components/ToastProvider";
 
 const lora = Lora({
   variable: "--font-lora-base",
@@ -66,7 +67,8 @@ export default async function RootLayout({
         <div className="w-full max-w-md min-h-screen bg-background shadow-xl flex flex-col relative">
           <CartProvider>
             <ModalProvider>
-              <HeaderBrand isLoggedIn={isLoggedIn} />
+              <ToastProvider>
+                <HeaderBrand isLoggedIn={isLoggedIn} />
             {children}
             <footer className="p-4 text-center text-xs text-black/50 mt-auto flex flex-col items-center gap-3">
               <div>
@@ -129,6 +131,7 @@ export default async function RootLayout({
                 </Link>
               )}
             </footer>
+          </ToastProvider>
           </ModalProvider>
           </CartProvider>
         </div>

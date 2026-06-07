@@ -21,7 +21,7 @@ export async function getAvailableTimes(date: string, excludeId?: string) {
   await dbConnect();
   
   // Find all reservations for this date
-  const query: any = { date };
+  const query: any = { date, isDeleted: { $ne: true } };
   if (excludeId) {
     query._id = { $ne: excludeId };
   }
@@ -48,7 +48,7 @@ export async function createReservation(data: {
   await dbConnect();
 
   // Validate time is still available
-  const existing = await Reservation.findOne({ date: data.date, time: data.time });
+  const existing = await Reservation.findOne({ date: data.date, time: data.time, isDeleted: { $ne: true } });
   if (existing) {
     return { success: false, error: "This time slot is no longer available. Please select another time." };
   }
@@ -118,7 +118,7 @@ export async function createReservation(data: {
 
 export async function getReservationForEdit(id: string, token: string) {
   await dbConnect();
-  const reservation = await Reservation.findOne({ _id: id, editToken: token });
+  const reservation = await Reservation.findOne({ _id: id, editToken: token, isDeleted: { $ne: true } });
   
   if (!reservation) {
     return { success: false, error: "Reservation not found or invalid token." };
@@ -134,7 +134,7 @@ export async function updateReservation(id: string, token: string, data: {
   totalPrice: number;
 }) {
   await dbConnect();
-  const reservation = await Reservation.findOne({ _id: id, editToken: token });
+  const reservation = await Reservation.findOne({ _id: id, editToken: token, isDeleted: { $ne: true } });
 
   if (!reservation) {
     return { success: false, error: "Reservation not found or invalid token." };
@@ -156,7 +156,8 @@ export async function updateReservation(id: string, token: string, data: {
   const existing = await Reservation.findOne({ 
     date: data.date, 
     time: data.time,
-    _id: { $ne: id } 
+    _id: { $ne: id },
+    isDeleted: { $ne: true }
   });
   if (existing) {
     return { success: false, error: "This time slot is no longer available. Please select another time." };
@@ -176,7 +177,7 @@ export async function updateReservation(id: string, token: string, data: {
 
 export async function cancelReservation(id: string, token: string) {
   await dbConnect();
-  const reservation = await Reservation.findOne({ _id: id, editToken: token });
+  const reservation = await Reservation.findOne({ _id: id, editToken: token, isDeleted: { $ne: true } });
 
   if (!reservation) {
     return { success: false, error: "Reservation not found or invalid token." };
@@ -244,9 +245,10 @@ export async function cancelReservation(id: string, token: string) {
 
 export async function getReservedItemIds() {
   await dbConnect();
-  // Fetch items from all active reservations (not cancelled)
+  // Fetch items from all active reservations (not cancelled, not deleted)
   const activeReservations = await Reservation.find({ 
-    status: { $in: ["pending", "confirmed"] } 
+    status: { $in: ["pending", "confirmed"] },
+    isDeleted: { $ne: true }
   }).select("items.id");
 
   const reservedIds = new Set<string>();
@@ -269,7 +271,7 @@ export async function getAllReservations() {
   }
 
   await dbConnect();
-  const reservations = await Reservation.find({}).sort({ createdAt: -1 });
+  const reservations = await Reservation.find({ isDeleted: { $ne: true } }).sort({ createdAt: -1 });
   return JSON.parse(JSON.stringify(reservations));
 }
 
@@ -285,7 +287,7 @@ export async function adminCancelReservation(id: string) {
   await dbConnect();
   const reservation = await Reservation.findById(id);
 
-  if (!reservation) {
+  if (!reservation || reservation.isDeleted) {
     return { success: false, error: "Reservation not found." };
   }
 
@@ -351,11 +353,31 @@ export async function deleteReservation(id: string) {
   }
 
   await dbConnect();
-  const result = await Reservation.findByIdAndDelete(id);
+  // SOFT DELETE
+  const result = await Reservation.findByIdAndUpdate(id, { 
+    isDeleted: true, 
+    deletedAt: new Date() 
+  });
 
   if (!result) {
     return { success: false, error: "Reservation not found." };
   }
+
+  return { success: true };
+}
+
+export async function restoreReservation(id: string) {
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get('admin_session')?.value;
+  const session = await verifySession(sessionCookie);
+
+  if (!session) throw new Error("Unauthorized");
+
+  await dbConnect();
+  await Reservation.findByIdAndUpdate(id, { 
+    isDeleted: false, 
+    $unset: { deletedAt: 1 } 
+  });
 
   return { success: true };
 }
@@ -390,7 +412,33 @@ export async function adminBulkDeleteReservations(ids: string[]) {
   }
 
   await dbConnect();
-  const result = await Reservation.deleteMany({ _id: { $in: ids } });
+  // SOFT DELETE BULK
+  const result = await Reservation.updateMany(
+    { _id: { $in: ids } }, 
+    { 
+      isDeleted: true, 
+      deletedAt: new Date() 
+    }
+  );
 
-  return { success: true, deletedCount: result.deletedCount };
+  return { success: true, deletedCount: result.modifiedCount };
+}
+
+export async function bulkRestoreReservations(ids: string[]) {
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get('admin_session')?.value;
+  const session = await verifySession(sessionCookie);
+
+  if (!session) throw new Error("Unauthorized");
+
+  await dbConnect();
+  await Reservation.updateMany(
+    { _id: { $in: ids } }, 
+    { 
+      isDeleted: false, 
+      $unset: { deletedAt: 1 } 
+    }
+  );
+
+  return { success: true };
 }
