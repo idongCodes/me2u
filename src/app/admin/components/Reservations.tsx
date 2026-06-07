@@ -3,8 +3,10 @@
 import React, { useState, useEffect } from "react";
 import { getAllReservations, adminCancelReservation, deleteReservation } from "@/app/actions/reservation";
 import { Loader2, Calendar, User, Phone, Mail, ShoppingBag, XCircle, Trash2, CheckCircle2 } from "lucide-react";
+import { useModal } from "@/components/ModalProvider";
 
 export default function Reservations() {
+  const modal = useModal();
   const [reservations, setReservations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -27,38 +29,79 @@ export default function Reservations() {
   useEffect(() => {
     fetchReservations();
   }, []);
+const handleCancel = async (id: string) => {
+  const confirmed = await modal.confirm({
+    type: "warning",
+    title: "Cancel Reservation",
+    message: "Are you sure you want to cancel this reservation as admin? This will notify the customer via email.",
+    confirmLabel: "Yes, Cancel",
+    cancelLabel: "No, Keep it"
+  });
 
-  const handleCancel = async (id: string) => {
-    if (!confirm("Are you sure you want to cancel this reservation as admin? This will notify the customer.")) return;
+  if (!confirmed) return;
 
-    setCancellingId(id);
-    try {
-      const result = await adminCancelReservation(id);
-      if (result.success) {
-        await fetchReservations();
-      } else {
-        alert(result.error || "Failed to cancel reservation.");
-      }
-    } catch (err) {
-      alert("An unexpected error occurred.");
-    } finally {
-      setCancellingId(null);
+  setCancellingId(id);
+  try {
+    const result = await adminCancelReservation(id);
+    if (result.success) {
+      await fetchReservations();
+      modal.alert({
+        type: "success",
+        title: "Cancelled",
+        message: "The reservation has been cancelled successfully."
+      });
+    } else {
+      modal.alert({
+        type: "danger",
+        title: "Error",
+        message: result.error || "Failed to cancel reservation."
+      });
     }
-  };
+  } catch (err) {
+    modal.alert({
+      type: "danger",
+      title: "Error",
+      message: "An unexpected error occurred."
+    });
+  } finally {
+    setCancellingId(null);
+  }
+};
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Permanently delete this reservation? This cannot be undone.")) return;
+    const confirmed = await modal.confirm({
+      type: "danger",
+      title: "Delete Record",
+      message: "Permanently delete this reservation? This cannot be undone and the customer will NOT be notified.",
+      confirmLabel: "Delete Forever",
+      cancelLabel: "Cancel"
+    });
+
+    if (!confirmed) return;
 
     setDeletingId(id);
     try {
       const result = await deleteReservation(id);
       if (result.success) {
         await fetchReservations();
+        modal.alert({
+          type: "success",
+          title: "Deleted",
+          message: "The reservation record has been permanently deleted."
+        });
       } else {
-        alert(result.error || "Failed to delete reservation.");
+        modal.alert({
+          type: "danger",
+          title: "Error",
+          message: result.error || "Failed to delete reservation."
+        });
       }
     } catch (err) {
-      alert("An unexpected error occurred.");
+      modal.alert({
+        type: "danger",
+        title: "Error",
+        message: "An unexpected error occurred."
+      });
     } finally {
       setDeletingId(null);
     }

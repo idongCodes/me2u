@@ -12,6 +12,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { getMessages, updateMessageStatus, deleteMessage } from '@/app/actions/inbox';
+import { useModal } from '@/components/ModalProvider';
 
 type Message = {
   id: string;
@@ -25,6 +26,7 @@ type Message = {
 };
 
 function MessageCard({ msg, onUpdate }: { msg: Message, onUpdate: () => void }) {
+  const modal = useModal();
   const [loading, setLoading] = useState(false);
 
   const handleStatusUpdate = async (status: Message['status']) => {
@@ -33,20 +35,37 @@ function MessageCard({ msg, onUpdate }: { msg: Message, onUpdate: () => void }) 
       await updateMessageStatus(msg.id, status);
       onUpdate();
     } catch (err) {
-      alert("Failed to update message.");
+      modal.alert({
+        type: "danger",
+        title: "Error",
+        message: "Failed to update message status."
+      });
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!confirm("Permanently delete this message?")) return;
+    const confirmed = await modal.confirm({
+      type: "danger",
+      title: "Delete Message",
+      message: "Are you sure you want to permanently delete this message? This action cannot be undone.",
+      confirmLabel: "Delete Forever",
+      cancelLabel: "Cancel"
+    });
+
+    if (!confirmed) return;
+
     setLoading(true);
     try {
       await deleteMessage(msg.id);
       onUpdate();
     } catch (err) {
-      alert("Failed to delete message.");
+      modal.alert({
+        type: "danger",
+        title: "Error",
+        message: "Failed to delete message."
+      });
     } finally {
       setLoading(false);
     }

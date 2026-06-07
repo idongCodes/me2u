@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { getReservationForEdit, updateReservation, cancelReservation, getAvailableTimes } from "@/app/actions/reservation";
 import { SHOP_ITEMS, ShopItem } from "@/lib/items";
 import { CheckCircle2, Loader2, X, Plus, Trash2, Calendar, AlertCircle, ShoppingBag, Clock } from "lucide-react";
+import { useModal } from "@/components/ModalProvider";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -14,6 +15,7 @@ interface PageProps {
 }
 
 export default function ManageReservationPage({ params }: PageProps) {
+  const modal = useModal();
   const { id } = use(params);
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -151,7 +153,15 @@ export default function ManageReservationPage({ params }: PageProps) {
   };
 
   const handleCancel = async () => {
-    if (!confirm("Are you sure you want to cancel this reservation?")) return;
+    const confirmed = await modal.confirm({
+      type: "warning",
+      title: "Cancel Reservation",
+      message: "Are you sure you want to cancel your reservation? This action cannot be undone.",
+      confirmLabel: "Yes, Cancel",
+      cancelLabel: "No, Keep it"
+    });
+
+    if (!confirmed) return;
 
     setSubmitting(true);
     setError("");
