@@ -10,14 +10,40 @@ import {
   CalendarCheck, 
   Heart, 
   Plus, 
-  ArrowRight
+  ArrowRight,
+  Loader2
 } from "lucide-react";
 import { getApprovedTestimonials } from "@/app/actions/testimonials";
+import { submitContactForm } from "@/app/actions/contact";
 import LeaveTestimonialModal from "@/components/LeaveTestimonialModal";
 
 export default function Home() {
   const [liveTestimonials, setLiveTestimonials] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [contactPending, setContactPending] = useState(false);
+  const [contactMessage, setContactMessage] = useState({ type: "", text: "" });
+
+  const handleContactSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setContactPending(true);
+    setContactMessage({ type: "", text: "" });
+
+    const formData = new FormData(e.currentTarget);
+    
+    try {
+      const res = await submitContactForm(formData);
+      if (res.success) {
+        setContactMessage({ type: "success", text: "Your inquiry has been sent!" });
+        (e.target as HTMLFormElement).reset();
+      } else {
+        setContactMessage({ type: "error", text: res.error || "Something went wrong." });
+      }
+    } catch (err) {
+      setContactMessage({ type: "error", text: "Something went wrong. Please try again." });
+    } finally {
+      setContactPending(false);
+    }
+  };
 
   useEffect(() => {
     const fetchTestimonials = async () => {
@@ -179,6 +205,81 @@ export default function Home() {
               <ArrowRight size={18} strokeWidth={3} className="transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section className="w-full p-6 py-16 bg-white">
+        <div className="max-w-md mx-auto space-y-8">
+          <div className="text-center space-y-2">
+            <h2 className="text-3xl font-bold tracking-tight">Contact <span className="text-skyblue">FM2U</span></h2>
+            <p className="text-gray-500 text-sm font-medium leading-relaxed">
+              Contact <span className="text-skyblue font-bold">FM2U</span> for help or inquiries.
+            </p>
+          </div>
+
+          <form onSubmit={handleContactSubmit} className="space-y-4">
+            {contactMessage.text && (
+              <div className={`p-4 rounded-2xl text-sm font-bold border animate-in fade-in slide-in-from-top-2 ${
+                contactMessage.type === 'error' ? 'bg-red-50 text-red-600 border-red-100' : 'bg-green-50 text-green-600 border-green-100'
+              }`}>
+                {contactMessage.text}
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <label htmlFor="home-name" className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Name</label>
+                <input 
+                  required
+                  id="home-name"
+                  name="name"
+                  type="text" 
+                  className="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-skyblue outline-none text-sm font-bold"
+                  placeholder="John Doe"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label htmlFor="home-email" className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Email</label>
+                <input 
+                  required
+                  id="home-email"
+                  name="email"
+                  type="email" 
+                  className="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-skyblue outline-none text-sm font-bold"
+                  placeholder="john@example.com"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label htmlFor="home-message" className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Message</label>
+                <textarea 
+                  required
+                  id="home-message"
+                  name="message"
+                  rows={4}
+                  className="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-skyblue outline-none text-sm font-medium resize-none leading-relaxed"
+                  placeholder="How can we help?"
+                />
+              </div>
+
+              <button 
+                type="submit" 
+                disabled={contactPending}
+                className="w-full p-4 bg-black text-white rounded-full font-black text-xs uppercase tracking-widest hover:bg-skyblue hover:text-black transition-all active:scale-95 disabled:opacity-50 shadow-xl mt-2 flex items-center justify-center gap-2"
+              >
+                {contactPending ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  "Send Message"
+                )}
+              </button>
+            </div>
+          </form>
         </div>
       </section>
 
