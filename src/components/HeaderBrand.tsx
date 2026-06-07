@@ -76,7 +76,7 @@ export default function HeaderBrand({ isLoggedIn = false }: HeaderBrandProps) {
           className="px-6 py-4 border-b border-gray-100/50 text-black/80 hover:bg-gray-50 hover:text-skyblue transition-colors font-medium"
           onClick={() => setIsMenuOpen(false)}
         >
-          Contact Us
+          Contact <span className="text-skyblue">FM2U</span>
         </Link>
         {isLoggedIn && (
           <Link

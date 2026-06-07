@@ -45,7 +45,7 @@ export default function ContactPage() {
             />
           </div>
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">Contact Us</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Contact <span className="text-skyblue">FM2U</span></h1>
             <p className="text-black/70">
               We'd love to hear from you.
             </p>
