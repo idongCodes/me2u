@@ -14,7 +14,7 @@ export interface ITestimonial extends Document {
 const TestimonialSchema: Schema = new Schema(
   {
     name: { type: String, required: true },
-    location: { type: String, default: "Worcester Neighbor" },
+    location: { type: String, default: "Worcester County" },
     content: { type: String, required: true },
     status: {
       type: String,

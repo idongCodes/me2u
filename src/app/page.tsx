@@ -126,7 +126,7 @@ export default function Home() {
               className="flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest text-skyblue bg-skyblue/5 border border-skyblue/10 px-4 py-2 rounded-full hover:bg-skyblue hover:text-black transition-all active:scale-95"
             >
               <Plus size={12} strokeWidth={3} />
-              Leave one
+              Leave Testimonial
             </button>
           </div>
 
@@ -142,7 +142,7 @@ export default function Home() {
                   <div className="w-10 h-10 bg-skyblue/10 rounded-full flex items-center justify-center text-skyblue font-black text-xs">JS</div>
                   <div>
                     <p className="text-sm font-bold text-gray-900">Jessica S.</p>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Worcester Neighbor</p>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Worcester County</p>
                   </div>
                 </div>
               </div>
