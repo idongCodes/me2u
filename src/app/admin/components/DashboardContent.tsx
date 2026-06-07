@@ -4,9 +4,10 @@ import React, { useState } from "react";
 import Inbox from "./Inbox";
 import Reservations from "./Reservations";
 import Inventory from "./Inventory";
-import { MessageSquare, CalendarDays, Package } from "lucide-react";
+import Testimonials from "./Testimonials";
+import { MessageSquare, CalendarDays, Package, Heart } from "lucide-react";
 
-type Tab = "reservations" | "inbox" | "inventory";
+type Tab = "reservations" | "inbox" | "inventory" | "testimonials";
 
 export default function DashboardContent() {
   const [activeTab, setActiveTab] = useState<Tab>("reservations");
@@ -27,17 +28,6 @@ export default function DashboardContent() {
           Reservations
         </button>
         <button
-          onClick={() => setActiveTab("inbox")}
-          className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
-            activeTab === "inbox"
-              ? "bg-white dark:bg-gray-800 text-black dark:text-white shadow-sm"
-              : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-          }`}
-        >
-          <MessageSquare size={16} />
-          Inbox
-        </button>
-        <button
           onClick={() => setActiveTab("inventory")}
           className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
             activeTab === "inventory"
@@ -48,11 +38,36 @@ export default function DashboardContent() {
           <Package size={16} />
           Inventory
         </button>
+        <button
+          onClick={() => setActiveTab("testimonials")}
+          className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+            activeTab === "testimonials"
+              ? "bg-white dark:bg-gray-800 text-black dark:text-white shadow-sm"
+              : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+          }`}
+        >
+          <Heart size={16} />
+          Testimonials
+        </button>
+        <button
+          onClick={() => setActiveTab("inbox")}
+          className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+            activeTab === "inbox"
+              ? "bg-white dark:bg-gray-800 text-black dark:text-white shadow-sm"
+              : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+          }`}
+        >
+          <MessageSquare size={16} />
+          Inbox
+        </button>
       </div>
 
       {/* Content Area */}
       <div className="animate-in fade-in duration-500 slide-in-from-bottom-2">
-        {activeTab === "reservations" ? <Reservations /> : activeTab === "inbox" ? <Inbox /> : <Inventory />}
+        {activeTab === "reservations" ? <Reservations /> : 
+         activeTab === "inventory" ? <Inventory /> :
+         activeTab === "testimonials" ? <Testimonials /> :
+         <Inbox />}
       </div>
     </div>
   );
