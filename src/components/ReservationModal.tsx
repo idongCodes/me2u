@@ -20,7 +20,8 @@ export default function ReservationModal({ isOpen, onClose }: ReservationModalPr
   const [phone, setPhone] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
-  const [optIn, setOptIn] = useState<"sms" | "email" | "both" | "none">("none");
+  const [wantsSms, setWantsSms] = useState(false);
+  const [wantsEmail, setWantsEmail] = useState(false);
   
   // Data State
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
@@ -62,6 +63,12 @@ export default function ReservationModal({ isOpen, onClose }: ReservationModalPr
     setSubmitting(true);
     setError("");
 
+    // Calculate final optIn string
+    let finalOptIn: "sms" | "email" | "both" | "none" = "none";
+    if (wantsSms && wantsEmail) finalOptIn = "both";
+    else if (wantsSms) finalOptIn = "sms";
+    else if (wantsEmail) finalOptIn = "email";
+
     try {
       const result = await createReservation({
         name,
@@ -69,7 +76,7 @@ export default function ReservationModal({ isOpen, onClose }: ReservationModalPr
         phone,
         date,
         time,
-        optIn,
+        optIn: finalOptIn,
         items,
         totalPrice,
       });
@@ -230,29 +237,6 @@ export default function ReservationModal({ isOpen, onClose }: ReservationModalPr
 
               {/* Footer / Submit */}
               <div className="pt-4 mt-4 border-t border-gray-100">
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-skyblue hover:text-black transition-colors flex items-center justify-center disabled:opacity-70 disabled:hover:bg-black disabled:hover:text-white"
-                >
-                  {submitting ? (
-                    <>
-                      <Loader2 size={20} className="animate-spin mr-2" />
-                      Processing...
-                    </>
-                  ) : (
-                    "Confirm Reservation"
-                  )}
-                </button>
-              </div>
-            </form>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-4 border-t border-gray-100">
                 <button
                   type="submit"
                   disabled={submitting}
