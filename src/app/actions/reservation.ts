@@ -94,7 +94,7 @@ export async function createReservation(data: {
 
     // --- NOTIFY CUSTOMER ---
     const wantsEmail = data.optIn === "email" || data.optIn === "both";
-    const customerNotificationText = `Hi ${data.name}, your reservation at Me2U for ${data.date} at ${data.time} is confirmed! Total: $${data.totalPrice} (Cash Only). We look forward to seeing you.\n\nYou can edit or cancel your reservation within 15 minutes here: ${manageUrl}`;
+    const customerNotificationText = `Hi ${data.name}, your reservation at Me2U for ${data.date} at ${data.time} is confirmed! Total: $${data.totalPrice} (Cash Only).\n\nAddress: 212 May St, Worcester, MA 01602\n\nWe look forward to seeing you.\n\nYou can edit or cancel your reservation within 15 minutes here: ${manageUrl}`;
 
     if (wantsEmail && resendApiKey) {
       const resend = new Resend(resendApiKey);
