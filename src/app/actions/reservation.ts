@@ -198,10 +198,15 @@ export async function cancelReservation(id: string, token: string) {
   try {
     const adminEmail = process.env.ADMIN_EMAIL || "idongcodes@gmail.com";
     const resendApiKey = process.env.RESEND_API_KEY;
+    const twilioSid = process.env.TWILIO_ACCOUNT_SID;
+    const twilioAuth = process.env.TWILIO_AUTH_TOKEN;
+    const twilioPhone = process.env.TWILIO_PHONE_NUMBER;
+    const adminPhone = "+17743126471";
+
+    const cancelText = `Reservation for ${reservation.name} on ${reservation.date} at ${reservation.time} has been CANCELLED.`;
 
     if (resendApiKey) {
       const resend = new Resend(resendApiKey);
-      const cancelText = `Reservation for ${reservation.name} on ${reservation.date} at ${reservation.time} has been CANCELLED.`;
       
       // Notify Admin
       await resend.emails.send({
@@ -219,8 +224,17 @@ export async function cancelReservation(id: string, token: string) {
         text: `Hi ${reservation.name}, your reservation for ${reservation.date} at ${reservation.time} has been successfully cancelled. We hope to see you another time!`,
       });
     }
+
+    if (twilioSid && twilioAuth && twilioPhone) {
+      const client = twilio(twilioSid, twilioAuth);
+      await client.messages.create({
+        body: `CANCELLED: ${cancelText}`,
+        from: twilioPhone,
+        to: adminPhone,
+      }).catch(err => console.error("Twilio Admin Cancel SMS Error:", err));
+    }
   } catch (error) {
-    console.error("Cancellation Email Error:", error);
+    console.error("Cancellation Notification Error:", error);
   }
 
   return { success: true };
