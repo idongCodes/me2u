@@ -69,7 +69,7 @@ export default function ShopPage() {
         </div>
 
         {/* Shop Items Grid */}
-        <div className="w-full mt-8 grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <div className="w-full mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           
           {items.length === 0 ? (
             <div className="col-span-full py-20 text-center space-y-4 opacity-50">
