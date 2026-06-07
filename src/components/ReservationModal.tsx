@@ -191,9 +191,9 @@ export default function ReservationModal({ isOpen, onClose }: ReservationModalPr
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="block text-sm font-medium text-gray-700">Date</label>
                     <input 
                       type="date" 
                       required 
@@ -206,17 +206,17 @@ export default function ReservationModal({ isOpen, onClose }: ReservationModalPr
                           setTime("");
                         }
                       }}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                      className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black bg-white"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Time</label>
+                  <div className="space-y-1">
+                    <label className="block text-sm font-medium text-gray-700">Time</label>
                     <select
                       required
                       value={time}
                       onChange={e => setTime(e.target.value)}
                       disabled={!date || loadingTimes}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black disabled:bg-gray-100"
+                      className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black disabled:bg-gray-100 bg-white"
                     >
                       <option value="">{loadingTimes ? "Loading..." : "Select time"}</option>
                       {availableTimes.map(t => (

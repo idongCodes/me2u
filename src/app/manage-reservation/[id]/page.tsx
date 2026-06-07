@@ -355,7 +355,7 @@ export default function ManageReservationPage({ params }: PageProps) {
             <span>Schedule</span>
           </div>
           
-          <div className="grid grid-cols-1 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className={`bg-white p-4 rounded-2xl border border-gray-100 shadow-sm transition-opacity ${!canEdit ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}>
               <label className="block text-[10px] font-black text-gray-400 mb-2 uppercase">Arrival Date</label>
               <input 
