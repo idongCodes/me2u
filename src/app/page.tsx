@@ -9,8 +9,8 @@ export default function Home() {
         {/* Hero Illustration */}
         <div className="relative w-64 h-64 mb-4">
           <Image 
-            src="/undraw_family_6gj8.svg" 
-            alt="Happy Family Illustration" 
+            src="/undraw_for-sale_7qjb.svg" 
+            alt="For Sale Illustration" 
             fill
             className="object-contain"
             priority
