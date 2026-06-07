@@ -239,3 +239,20 @@ export async function cancelReservation(id: string, token: string) {
 
   return { success: true };
 }
+
+export async function getReservedItemIds() {
+  await dbConnect();
+  // Fetch items from all active reservations (not cancelled)
+  const activeReservations = await Reservation.find({ 
+    status: { $in: ["pending", "confirmed"] } 
+  }).select("items.id");
+
+  const reservedIds = new Set<string>();
+  activeReservations.forEach(res => {
+    res.items.forEach((item: any) => {
+      reservedIds.add(item.id);
+    });
+  });
+
+  return Array.from(reservedIds);
+}
