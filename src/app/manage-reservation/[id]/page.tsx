@@ -5,7 +5,7 @@ import { use } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getReservationForEdit, updateReservation, cancelReservation, getAvailableTimes } from "@/app/actions/reservation";
 import { SHOP_ITEMS, ShopItem } from "@/lib/items";
-import { CheckCircle2, Loader2, X, Plus, Trash2, Calendar, AlertCircle } from "lucide-react";
+import { CheckCircle2, Loader2, X, Plus, Trash2, Calendar, AlertCircle, ShoppingBag, Clock } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -137,160 +137,192 @@ export default function ManageReservationPage({ params }: PageProps) {
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center p-6 min-h-[60vh]">
-        <Loader2 className="animate-spin text-skyblue" size={48} />
+        <Loader2 className="animate-spin text-skyblue" size={32} />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-4 min-h-[60vh]">
-        <AlertCircle size={64} className="text-red-500" />
-        <h1 className="text-2xl font-bold">Something went wrong</h1>
-        <p className="text-gray-600 max-w-md">{error}</p>
-        <Link href="/shop" className="bg-black text-white px-6 py-2 rounded-lg font-medium">
+      <main className="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-6">
+        <div className="bg-red-50 p-6 rounded-full">
+          <AlertCircle size={48} className="text-red-500" />
+        </div>
+        <div className="space-y-2">
+          <h1 className="text-xl font-bold">Something went wrong</h1>
+          <p className="text-gray-500 text-sm max-w-xs mx-auto">{error}</p>
+        </div>
+        <Link href="/shop" className="w-full max-w-xs bg-black text-white py-4 rounded-2xl font-bold shadow-md active:scale-95 transition-transform">
           Return to Shop
         </Link>
-      </div>
+      </main>
     );
   }
 
   if (step === "success-edit" || step === "success-cancel") {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-4 min-h-[60vh]">
-        <CheckCircle2 size={64} className="text-green-500" />
-        <h1 className="text-2xl font-bold">
-          {step === "success-edit" ? "Reservation Updated!" : "Reservation Cancelled"}
-        </h1>
-        <p className="text-gray-600 max-w-md">
-          {step === "success-edit" 
-            ? "Your changes have been saved successfully." 
-            : "Your reservation has been cancelled. We hope to see you another time."}
-        </p>
-        <Link href="/shop" className="bg-black text-white px-6 py-2 rounded-lg font-medium">
+      <main className="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-6">
+        <div className="bg-green-50 p-6 rounded-full animate-bounce">
+          <CheckCircle2 size={48} className="text-green-500" />
+        </div>
+        <div className="space-y-2">
+          <h1 className="text-xl font-bold">
+            {step === "success-edit" ? "Reservation Updated!" : "Reservation Cancelled"}
+          </h1>
+          <p className="text-gray-500 text-sm max-w-xs mx-auto leading-relaxed">
+            {step === "success-edit" 
+              ? "Your changes have been saved successfully. We've updated your booking." 
+              : "Your reservation has been cancelled. All items have been released."}
+          </p>
+        </div>
+        <Link href="/shop" className="w-full max-w-xs bg-black text-white py-4 rounded-2xl font-bold shadow-md active:scale-95 transition-transform">
           Return to Shop
         </Link>
-      </div>
+      </main>
     );
   }
 
   return (
-    <main className="flex-1 flex flex-col p-6 items-center">
-      <div className="w-full max-w-2xl space-y-8 mt-4">
-        <div className="space-y-2">
-          <h1 className="text-2xl font-bold tracking-tight">Manage Your Reservation</h1>
-          <p className="text-gray-600 text-sm">
-            Hi {reservation.name}, you have a 15-minute window from booking to make changes.
+    <main className="flex-1 flex flex-col bg-gray-50/50">
+      {/* Header Info */}
+      <div className="bg-white px-6 pt-8 pb-6 border-b border-gray-100 shadow-sm">
+        <div className="w-full max-w-lg mx-auto space-y-2">
+          <h1 className="text-2xl font-black tracking-tight text-gray-900">Manage Booking</h1>
+          <div className="flex items-center gap-2 text-xs font-bold text-red-500 bg-red-50 px-3 py-1.5 rounded-full w-fit">
+            <Clock size={12} />
+            <span>15-MINUTE EDITING WINDOW ACTIVE</span>
+          </div>
+          <p className="text-gray-500 text-sm font-medium pt-1">
+            Hi <span className="text-black font-bold">{reservation.name}</span>, you can modify your reservation details below.
           </p>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Left Column: Date & Time */}
-          <div className="space-y-6">
-            <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
-              <h2 className="font-bold flex items-center gap-2 text-sm uppercase tracking-wider text-gray-400">
-                <Calendar size={16} />
-                Date & Time
-              </h2>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 mb-1">DATE</label>
-                  <input 
-                    type="date" 
-                    value={date} 
-                    min={new Date().toISOString().split("T")[0]}
-                    onChange={e => setDate(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black outline-none text-sm font-medium"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 mb-1">TIME</label>
-                  <select
-                    value={time}
-                    onChange={e => setTime(e.target.value)}
-                    disabled={loadingTimes}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black outline-none disabled:bg-gray-100 text-sm font-medium"
-                  >
-                    <option value="">Select time</option>
-                    {availableTimes.map(t => (
-                      <option key={t} value={t}>{t}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={handleCancel}
-              disabled={submitting}
-              className="w-full bg-white border-2 border-red-50 text-red-500 py-3 rounded-xl font-bold hover:bg-red-50 transition-colors flex items-center justify-center gap-2 text-sm shadow-sm"
-            >
-              <Trash2 size={16} />
-              Cancel Reservation
-            </button>
+      <div className="w-full max-w-lg mx-auto p-6 space-y-8">
+        {/* Error Alert */}
+        {error && (
+          <div className="p-4 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-3 text-red-600 animate-in slide-in-from-top-2">
+            <AlertCircle size={20} className="flex-shrink-0 mt-0.5" />
+            <p className="text-sm font-medium">{error}</p>
           </div>
+        )}
 
-          {/* Right Column: Items */}
-          <div className="space-y-6">
-            <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
-              <h2 className="font-bold text-sm uppercase tracking-wider text-gray-400">Reserved Items</h2>
-              <div className="space-y-3 max-h-[200px] overflow-y-auto pr-2">
-                {items.length > 0 ? items.map((item, idx) => (
-                  <div key={idx} className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
-                    <div className="flex flex-col">
-                      <span className="text-xs font-bold">{item.name}</span>
-                      <span className="text-xs text-skyblue font-bold">${item.price}</span>
-                    </div>
-                    <button 
-                      onClick={() => removeItemFromRes(idx)}
-                      className="p-1.5 text-gray-300 hover:text-red-500 transition-colors"
-                    >
-                      <X size={14} />
-                    </button>
-                  </div>
-                )) : (
-                  <p className="text-xs text-gray-400 italic py-2 text-center">No items selected.</p>
-                )}
-              </div>
-
-              <div className="pt-3 border-t border-gray-100 flex justify-between items-center">
-                <span className="font-bold text-sm">Total (Cash)</span>
-                <span className="font-bold text-lg text-skyblue">${totalPrice}</span>
-              </div>
+        {/* Section: Date & Time */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400">
+            <Calendar size={12} />
+            <span>Schedule</span>
+          </div>
+          
+          <div className="grid grid-cols-1 gap-3">
+            <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+              <label className="block text-[10px] font-black text-gray-400 mb-2 uppercase">Arrival Date</label>
+              <input 
+                type="date" 
+                value={date} 
+                min={new Date().toISOString().split("T")[0]}
+                onChange={e => setDate(e.target.value)}
+                className="w-full bg-transparent text-base font-bold outline-none border-none p-0 focus:ring-0"
+              />
             </div>
-
-            {/* Add More Items Section */}
-            <div className="space-y-3">
-              <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Add More Items</h3>
-              <div className="grid grid-cols-1 gap-2 max-h-[160px] overflow-y-auto pr-2">
-                {SHOP_ITEMS.map(item => (
-                  <button
-                    key={item.id}
-                    onClick={() => addItemToRes(item)}
-                    className="flex items-center gap-3 p-2 bg-white hover:border-skyblue border border-gray-100 rounded-xl transition-all text-left shadow-sm group"
-                  >
-                    <div className="w-8 h-8 bg-gray-50 rounded-lg flex-shrink-0 relative overflow-hidden">
-                       <Image src={item.images[0]} alt={item.name} fill className="object-contain p-1" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-[10px] font-bold leading-tight group-hover:text-skyblue transition-colors">{item.name}</p>
-                      <p className="text-[10px] text-gray-500 font-bold">${item.price}</p>
-                    </div>
-                    <Plus size={14} className="text-gray-300" />
-                  </button>
+            
+            <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm relative">
+              <label className="block text-[10px] font-black text-gray-400 mb-2 uppercase">Arrival Time</label>
+              <select
+                value={time}
+                onChange={e => setTime(e.target.value)}
+                disabled={loadingTimes}
+                className="w-full bg-transparent text-base font-bold outline-none border-none p-0 focus:ring-0 appearance-none disabled:opacity-50"
+              >
+                <option value="">Select a time</option>
+                {availableTimes.map(t => (
+                  <option key={t} value={t}>{t}</option>
                 ))}
-              </div>
+              </select>
+              {loadingTimes && <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 animate-spin text-skyblue" size={16} />}
             </div>
-
-            <button
-              onClick={handleUpdate}
-              disabled={submitting}
-              className="w-full bg-black text-white py-4 rounded-xl font-bold hover:bg-skyblue hover:text-black transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 text-sm"
-            >
-              {submitting ? <Loader2 className="animate-spin" size={18} /> : "Update Reservation"}
-            </button>
           </div>
+        </div>
+
+        {/* Section: Reserved Items */}
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400">
+              <ShoppingBag size={12} />
+              <span>Your Items</span>
+            </div>
+            <span className="text-xs font-bold text-skyblue">Total: ${totalPrice}</span>
+          </div>
+
+          <div className="space-y-2">
+            {items.length > 0 ? items.map((item, idx) => (
+              <div key={idx} className="bg-white p-3 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-3 animate-in fade-in zoom-in-95 duration-200">
+                <div className="w-12 h-12 bg-gray-50 rounded-xl relative overflow-hidden flex-shrink-0">
+                  <Image src={SHOP_ITEMS.find(si => si.id === item.id)?.images[0] || '/shopping.svg'} alt={item.name} fill className="object-contain p-1.5" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold truncate">{item.name}</p>
+                  <p className="text-xs font-bold text-skyblue">${item.price}</p>
+                </div>
+                <button 
+                  onClick={() => removeItemFromRes(idx)}
+                  className="p-2 text-gray-300 hover:text-red-500 active:bg-red-50 rounded-full transition-all"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            )) : (
+              <div className="bg-white p-8 rounded-2xl border border-dashed border-gray-200 text-center space-y-2">
+                <p className="text-sm text-gray-400 font-medium italic">No items in reservation.</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Section: Quick Add */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400">
+            <Plus size={12} />
+            <span>Add More Items</span>
+          </div>
+          
+          <div className="flex overflow-x-auto gap-3 pb-2 -mx-2 px-2 snap-x [&::-webkit-scrollbar]:hidden">
+            {SHOP_ITEMS.map(item => (
+              <button
+                key={item.id}
+                onClick={() => addItemToRes(item)}
+                className="w-32 flex-shrink-0 snap-start bg-white p-3 rounded-2xl border border-gray-100 shadow-sm active:scale-95 transition-transform text-left space-y-2"
+              >
+                <div className="w-full aspect-square bg-gray-50 rounded-xl relative overflow-hidden">
+                   <Image src={item.images[0]} alt={item.name} fill className="object-contain p-2" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-bold truncate leading-tight">{item.name}</p>
+                  <p className="text-[10px] font-black text-skyblue">${item.price}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Actions Footer */}
+        <div className="pt-4 space-y-3 pb-12">
+          <button
+            onClick={handleUpdate}
+            disabled={submitting}
+            className="w-full bg-black text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {submitting ? <Loader2 className="animate-spin" size={20} /> : "Save Changes"}
+          </button>
+          
+          <button
+            onClick={handleCancel}
+            disabled={submitting}
+            className="w-full py-4 text-red-500 font-black text-xs uppercase tracking-widest hover:bg-red-50 rounded-2xl transition-colors flex items-center justify-center gap-2"
+          >
+            <Trash2 size={14} />
+            Cancel Reservation
+          </button>
         </div>
       </div>
     </main>
