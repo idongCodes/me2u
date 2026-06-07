@@ -7,6 +7,7 @@ import { getReservationForEdit, updateReservation, cancelReservation, getAvailab
 import { getAvailableShopItems } from "@/app/actions/shop-items";
 import { CheckCircle2, Loader2, X, Plus, Trash2, Calendar, AlertCircle, ShoppingBag, Clock, Tag } from "lucide-react";
 import { useModal } from "@/components/ModalProvider";
+import { formatTo12hr } from "@/lib/time";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -377,7 +378,7 @@ export default function ManageReservationPage({ params }: PageProps) {
               >
                 <option value="">Select a time</option>
                 {availableTimes.map(t => (
-                  <option key={t} value={t}>{t}</option>
+                  <option key={t} value={t}>{formatTo12hr(t)}</option>
                 ))}
               </select>
               {loadingTimes && <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 animate-spin text-skyblue" size={16} />}

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { getAvailableTimes, createReservation } from "@/app/actions/reservation";
 import { useCart } from "@/components/CartProvider";
 import { useModal } from "@/components/ModalProvider";
+import { formatTo12hr } from "@/lib/time";
 import { X, CheckCircle2, Loader2 } from "lucide-react";
 
 interface ReservationModalProps {
@@ -219,7 +220,7 @@ export default function ReservationModal({ isOpen, onClose }: ReservationModalPr
                     >
                       <option value="">{loadingTimes ? "Loading..." : "Select time"}</option>
                       {availableTimes.map(t => (
-                        <option key={t} value={t}>{t}</option>
+                        <option key={t} value={t}>{formatTo12hr(t)}</option>
                       ))}
                     </select>
                   </div>

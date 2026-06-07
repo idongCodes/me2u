@@ -8,6 +8,7 @@ import crypto from "crypto";
 import { cookies } from 'next/headers';
 import { verifySession } from '@/lib/auth';
 import { generateCalendarLinks } from "@/lib/calendar";
+import { formatTo12hr } from "@/lib/time";
 
 // Generate times from 10:00 to 17:00 in 30-min intervals
 const ALL_TIMES = [
@@ -166,7 +167,7 @@ export async function createReservation(data: {
         html: getEmailTemplate({
           title: "New Reservation Received",
           name: "Admin",
-          details: `${data.date} at ${data.time}`,
+          details: `${data.date} at ${formatTo12hr(data.time)}`,
           itemsList,
           totalPrice: data.totalPrice,
           googleUrl,
@@ -185,7 +186,7 @@ export async function createReservation(data: {
           html: getEmailTemplate({
             title: "Reservation Confirmed!",
             name: data.name,
-            details: `${data.date} at ${data.time}`,
+            details: `${data.date} at ${formatTo12hr(data.time)}`,
             itemsList,
             totalPrice: data.totalPrice,
             googleUrl,
@@ -200,7 +201,7 @@ export async function createReservation(data: {
     if (twilioSid && twilioAuth && twilioPhone) {
       const client = twilio(twilioSid, twilioAuth);
       await client.messages.create({
-        body: `Me2U: New Reservation from ${data.name} for ${data.date} at ${data.time}. Total: $${data.totalPrice}. View details in email.`,
+        body: `Me2U: New Reservation from ${data.name} for ${data.date} at ${formatTo12hr(data.time)}. Total: $${data.totalPrice}. View details in email.`,
         from: twilioPhone,
         to: adminPhone,
       }).catch(err => console.error("Twilio Admin SMS Error:", err));
@@ -261,7 +262,7 @@ export async function cancelReservation(id: string, token: string) {
     if (resendApiKey) {
       const resend = new Resend(resendApiKey);
       const subject = `CANCELLED: Reservation - ${reservation.name}`;
-      const text = `Reservation for ${reservation.name} on ${reservation.date} at ${reservation.time} has been CANCELLED.`;
+      const text = `Reservation for ${reservation.name} on ${reservation.date} at ${formatTo12hr(reservation.time)} has been CANCELLED.`;
       await resend.emails.send({ from: "Me2U <hello@fromme2u.app>", to: adminEmail, subject, text });
       await resend.emails.send({ from: "Me2U <hello@fromme2u.app>", to: reservation.email, subject, text: `Hi ${reservation.name}, your reservation has been cancelled.` });
     }
