@@ -16,23 +16,34 @@ const lora = Lora({
 });
 
 export const metadata: Metadata = {
-  title: "FromMe2U",
-  description: "A custom digital shop in Worcester, MA, showcasing and selling gently used baby and toddler clothes, strollers, cribs, and more from a smoke-free, pet-free home.",
+  title: {
+    default: "Me2U | Gently Used Home Goods in Worcester, MA",
+    template: "%s | Me2U Worcester"
+  },
+  description: "Shop gently used baby gear, toddler clothes, strollers, and cribs from a trusted, smoke-free home in Worcester, MA. Safe local pickup and scam-free handshake deals.",
+  keywords: ["Worcester MA", "baby gear", "used baby clothes", "toddler clothes", "strollers", "cribs", "local shop", "neighbor to neighbor", "gently used items", "Worcester County"],
+  authors: [{ name: "Me2U" }],
+  creator: "Me2U",
+  publisher: "Me2U",
+  metadataBase: new URL("https://fromme2u.app"),
+  alternates: {
+    canonical: "/",
+  },
   icons: {
     icon: "/shopping.svg",
     apple: "/shopping.svg",
   },
   openGraph: {
-    title: "FromMe2U",
-    description: "A custom digital shop in Worcester, MA, showcasing and selling gently used baby and toddler clothes, strollers, cribs, and more from a smoke-free, pet-free home.",
+    title: "Me2U | Gently Used Home Goods in Worcester, MA",
+    description: "Your local source for trusted, gently used baby and toddler items. Smoke-free, pet-free, and neighborhood-approved.",
     url: "https://fromme2u.app",
-    siteName: "FromMe2U",
+    siteName: "Me2U",
     images: [
       {
-        url: "/shopping.svg",
-        width: 800,
-        height: 600,
-        alt: "FromMe2U Shopping",
+        url: "/undraw_for-sale_7qjb.svg",
+        width: 1200,
+        height: 630,
+        alt: "Me2U - Gently Used Items from One Home to Another",
       },
     ],
     locale: "en_US",
@@ -40,10 +51,14 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "FromMe2U",
+    title: "Me2U | Gently Used Home Goods in Worcester, MA",
     description: "Shop for gently used baby clothes, strollers, and more in Worcester, MA.",
-    images: ["/shopping.svg"],
+    images: ["/undraw_for-sale_7qjb.svg"],
   },
+  robots: {
+    index: true,
+    follow: true,
+  }
 };
 
 export default async function RootLayout({
