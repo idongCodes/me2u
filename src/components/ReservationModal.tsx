@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { getAvailableTimes, createReservation } from "@/app/actions/reservation";
 import { useCart } from "@/components/CartProvider";
 import { X, CheckCircle2, Loader2 } from "lucide-react";
@@ -11,8 +12,16 @@ interface ReservationModalProps {
 }
 
 export default function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
+  const router = useRouter();
   const { items, totalPrice, clearCart } = useCart();
   const [step, setStep] = useState<"form" | "success">("form");
+
+  const handleClose = () => {
+    if (step === "success") {
+      router.push("/shop");
+    }
+    onClose();
+  };
   
   // Form State
   const [name, setName] = useState("");
@@ -102,7 +111,7 @@ export default function ReservationModal({ isOpen, onClose }: ReservationModalPr
             {step === "form" ? "Complete Reservation" : "Reservation Confirmed"}
           </h2>
           <button 
-            onClick={onClose}
+            onClick={handleClose}
             className="p-1 rounded-full hover:bg-gray-100 transition-colors"
             aria-label="Close"
           >
@@ -120,7 +129,7 @@ export default function ReservationModal({ isOpen, onClose }: ReservationModalPr
                 Your reservation has been confirmed. We&apos;ve sent the details to our team. Please remember payment is <strong>cash only</strong> upon arrival.
               </p>
               <button
-                onClick={onClose}
+                onClick={handleClose}
                 className="mt-4 w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-skyblue hover:text-black transition-colors"
               >
                 Close
