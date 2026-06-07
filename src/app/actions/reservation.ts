@@ -122,18 +122,6 @@ export async function getReservationForEdit(id: string, token: string) {
     return { success: false, error: "Reservation not found or invalid token." };
   }
 
-  // Check 15 min window
-  const now = new Date();
-  const diff = (now.getTime() - reservation.createdAt.getTime()) / 1000 / 60;
-  if (diff > 15) {
-    return { success: false, error: "The 15-minute window for editing this reservation has passed." };
-  }
-
-  // Check edit count limit (max 2 edits)
-  if (reservation.editCount >= 2) {
-    return { success: false, error: "You have reached the maximum of 2 modifications for this reservation." };
-  }
-
   return { success: true, reservation: JSON.parse(JSON.stringify(reservation)) };
 }
 
@@ -192,14 +180,48 @@ export async function cancelReservation(id: string, token: string) {
     return { success: false, error: "Reservation not found or invalid token." };
   }
 
-  // Check 15 min window
-  const now = new Date();
-  const diff = (now.getTime() - reservation.createdAt.getTime()) / 1000 / 60;
-  if (diff > 15) {
-    return { success: false, error: "The 15-minute window for cancelling this reservation has passed." };
+  // Check if it's at least 15 minutes before the booked time
+  const [year, month, day] = reservation.date.split("-").map(Number);
+  const [hour, minute] = reservation.time.split(":").map(Number);
+  const bookedDateTime = new Date(year, month - 1, day, hour, minute).getTime();
+  
+  const now = new Date().getTime();
+  const diffToBooking = (bookedDateTime - now) / 1000 / 60; // in minutes
+
+  if (diffToBooking < 15) {
+    return { success: false, error: "Reservations can only be cancelled up to 15 minutes before the scheduled time." };
   }
 
   await Reservation.updateOne({ _id: id }, { status: "cancelled" });
+
+  // Send Cancellation Notifications
+  try {
+    const adminEmail = process.env.ADMIN_EMAIL || "idongcodes@gmail.com";
+    const resendApiKey = process.env.RESEND_API_KEY;
+
+    if (resendApiKey) {
+      const resend = new Resend(resendApiKey);
+      const cancelText = `Reservation for ${reservation.name} on ${reservation.date} at ${reservation.time} has been CANCELLED.`;
+      
+      // Notify Admin
+      await resend.emails.send({
+        from: "Me2U Reservations <hello@fromme2u.app>",
+        to: adminEmail,
+        subject: `CANCELLED: Reservation - ${reservation.name}`,
+        text: cancelText,
+      });
+
+      // Notify Customer
+      await resend.emails.send({
+        from: "Me2U <hello@fromme2u.app>",
+        to: reservation.email,
+        subject: "Reservation Cancelled - Me2U",
+        text: `Hi ${reservation.name}, your reservation for ${reservation.date} at ${reservation.time} has been successfully cancelled. We hope to see you another time!`,
+      });
+    }
+  } catch (error) {
+    console.error("Cancellation Email Error:", error);
+  }
 
   return { success: true };
 }

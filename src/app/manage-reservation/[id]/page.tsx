@@ -31,6 +31,8 @@ export default function ManageReservationPage({ params }: PageProps) {
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
   const [loadingTimes, setLoadingTimes] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [editTimeLeft, setEditTimeLeft] = useState<number | null>(null);
+  const [cancelTimeLeft, setCancelTimeLeft] = useState<number | null>(null);
 
   useEffect(() => {
     if (!id || !token) {
@@ -60,8 +62,49 @@ export default function ManageReservationPage({ params }: PageProps) {
     fetchReservation();
   }, [id, token]);
 
+  // Countdown Timer Logic
   useEffect(() => {
-    if (!date) return;
+    if (!reservation) return;
+
+    const createdAt = new Date(reservation.createdAt).getTime();
+    const editExpiry = createdAt + 15 * 60 * 1000;
+
+    const [year, month, day] = reservation.date.split("-").map(Number);
+    const [hour, minute] = reservation.time.split(":").map(Number);
+    const bookedDateTime = new Date(year, month - 1, day, hour, minute).getTime();
+    const cancelExpiry = bookedDateTime - 15 * 60 * 1000;
+
+    const timer = setInterval(() => {
+      const now = new Date().getTime();
+      
+      // Edit timer
+      const editRemaining = Math.max(0, Math.floor((editExpiry - now) / 1000));
+      setEditTimeLeft(editRemaining);
+
+      // Cancel timer
+      const cancelRemaining = Math.max(0, Math.floor((cancelExpiry - now) / 1000));
+      setCancelTimeLeft(cancelRemaining);
+
+      if (editRemaining <= 0 && cancelRemaining <= 0) {
+        clearInterval(timer);
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [reservation]);
+
+  const formatTimeLeft = (seconds: number) => {
+    if (seconds >= 3600) {
+      const hrs = Math.floor(seconds / 3600);
+      const mins = Math.floor((seconds % 3600) / 60);
+      return `${hrs}h ${mins}m`;
+    }
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  useEffect(() => {
 
     const fetchTimes = async () => {
       setLoadingTimes(true);
@@ -126,12 +169,17 @@ export default function ManageReservationPage({ params }: PageProps) {
     }
   };
 
+  const canEdit = editTimeLeft !== null && editTimeLeft > 0 && reservation.editCount < 2;
+  const canCancel = cancelTimeLeft !== null && cancelTimeLeft > 0;
+
   const addItemToRes = (item: ShopItem) => {
+    if (!canEdit) return;
     if (items.some(i => i.id === item.id)) return;
     setItems([...items, { id: item.id, name: item.name, price: item.price }]);
   };
 
   const removeItemFromRes = (index: number) => {
+    if (!canEdit) return;
     setItems(items.filter((_, i) => i !== index));
   };
 
@@ -190,10 +238,24 @@ export default function ManageReservationPage({ params }: PageProps) {
         <div className="w-full max-w-lg mx-auto space-y-2">
           <h1 className="text-2xl font-black tracking-tight text-gray-900">Manage Booking</h1>
           <div className="flex flex-wrap gap-2">
-            <div className="flex items-center gap-2 text-[10px] font-black text-red-500 bg-red-50 px-3 py-1.5 rounded-full w-fit uppercase">
+            <div className={`flex items-center gap-2 text-[10px] font-black px-3 py-1.5 rounded-full w-fit uppercase transition-colors ${
+              (editTimeLeft !== null && editTimeLeft > 0) 
+                ? (editTimeLeft < 60 ? "bg-red-500 text-white animate-pulse" : "bg-red-50 text-red-500")
+                : "bg-gray-200 text-gray-500"
+            }`}>
               <Clock size={12} />
-              <span>15-Min Window</span>
+              <span>{editTimeLeft !== null && editTimeLeft > 0 ? `${formatTimeLeft(editTimeLeft)} Left to Edit` : "Edit Window Closed"}</span>
             </div>
+            
+            <div className={`flex items-center gap-2 text-[10px] font-black px-3 py-1.5 rounded-full w-fit uppercase transition-colors ${
+              (cancelTimeLeft !== null && cancelTimeLeft > 0)
+                ? (cancelTimeLeft < 300 ? "bg-orange-500 text-white animate-pulse" : "bg-green-50 text-green-600")
+                : "bg-gray-200 text-gray-500"
+            }`}>
+              <Trash2 size={12} />
+              <span>{cancelTimeLeft !== null && cancelTimeLeft > 0 ? `${formatTimeLeft(cancelTimeLeft)} Left to Cancel` : "Cancel Window Closed"}</span>
+            </div>
+
             <div className="flex items-center gap-2 text-[10px] font-black text-skyblue bg-skyblue/5 px-3 py-1.5 rounded-full w-fit uppercase">
               <AlertCircle size={12} />
               <span>{2 - reservation.editCount} Edits Left</span>
@@ -222,24 +284,25 @@ export default function ManageReservationPage({ params }: PageProps) {
           </div>
           
           <div className="grid grid-cols-1 gap-3">
-            <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+            <div className={`bg-white p-4 rounded-2xl border border-gray-100 shadow-sm transition-opacity ${!canEdit ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}>
               <label className="block text-[10px] font-black text-gray-400 mb-2 uppercase">Arrival Date</label>
               <input 
                 type="date" 
                 value={date} 
+                disabled={!canEdit}
                 min={new Date().toISOString().split("T")[0]}
                 onChange={e => setDate(e.target.value)}
-                className="w-full bg-transparent text-base font-bold outline-none border-none p-0 focus:ring-0"
+                className="w-full bg-transparent text-base font-bold outline-none border-none p-0 focus:ring-0 disabled:cursor-not-allowed"
               />
             </div>
             
-            <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm relative">
+            <div className={`bg-white p-4 rounded-2xl border border-gray-100 shadow-sm relative transition-opacity ${!canEdit ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}>
               <label className="block text-[10px] font-black text-gray-400 mb-2 uppercase">Arrival Time</label>
               <select
                 value={time}
                 onChange={e => setTime(e.target.value)}
-                disabled={loadingTimes}
-                className="w-full bg-transparent text-base font-bold outline-none border-none p-0 focus:ring-0 appearance-none disabled:opacity-50"
+                disabled={loadingTimes || !canEdit}
+                className="w-full bg-transparent text-base font-bold outline-none border-none p-0 focus:ring-0 appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <option value="">Select a time</option>
                 {availableTimes.map(t => (
@@ -273,7 +336,8 @@ export default function ManageReservationPage({ params }: PageProps) {
                 </div>
                 <button 
                   onClick={() => removeItemFromRes(idx)}
-                  className="p-2 text-gray-300 hover:text-red-500 active:bg-red-50 rounded-full transition-all"
+                  disabled={!canEdit}
+                  className="p-2 text-gray-300 hover:text-red-500 active:bg-red-50 rounded-full transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   <X size={18} />
                 </button>
@@ -287,7 +351,7 @@ export default function ManageReservationPage({ params }: PageProps) {
         </div>
 
         {/* Section: Quick Add */}
-        <div className="space-y-4">
+        <div className={`space-y-4 transition-all ${!canEdit ? 'opacity-50 pointer-events-none grayscale cursor-not-allowed' : ''}`}>
           <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400">
             <Plus size={12} />
             <span>Add More Items</span>
@@ -316,16 +380,16 @@ export default function ManageReservationPage({ params }: PageProps) {
         <div className="pt-4 space-y-3 pb-12">
           <button
             onClick={handleUpdate}
-            disabled={submitting}
-            className="w-full bg-black text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            disabled={submitting || !canEdit}
+            className="w-full bg-black text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {submitting ? <Loader2 className="animate-spin" size={20} /> : "Save Changes"}
           </button>
           
           <button
             onClick={handleCancel}
-            disabled={submitting}
-            className="w-full py-4 text-red-500 font-black text-xs uppercase tracking-widest hover:bg-red-50 rounded-2xl transition-colors flex items-center justify-center gap-2"
+            disabled={submitting || !canCancel}
+            className="w-full py-4 text-red-500 font-black text-xs uppercase tracking-widest hover:bg-red-50 rounded-2xl transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Trash2 size={14} />
             Cancel Reservation
