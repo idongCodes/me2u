@@ -340,3 +340,22 @@ export async function adminCancelReservation(id: string) {
 
   return { success: true };
 }
+
+export async function deleteReservation(id: string) {
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get('admin_session')?.value;
+  const session = await verifySession(sessionCookie);
+
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+
+  await dbConnect();
+  const result = await Reservation.findByIdAndDelete(id);
+
+  if (!result) {
+    return { success: false, error: "Reservation not found." };
+  }
+
+  return { success: true };
+}

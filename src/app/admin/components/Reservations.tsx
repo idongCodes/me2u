@@ -1,14 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { getAllReservations, adminCancelReservation } from "@/app/actions/reservation";
-import { Loader2, Calendar, User, Phone, Mail, ShoppingBag, XCircle, CheckCircle2 } from "lucide-react";
+import { getAllReservations, adminCancelReservation, deleteReservation } from "@/app/actions/reservation";
+import { Loader2, Calendar, User, Phone, Mail, ShoppingBag, XCircle, Trash2, CheckCircle2 } from "lucide-react";
 
 export default function Reservations() {
   const [reservations, setReservations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const fetchReservations = async () => {
@@ -34,7 +35,6 @@ export default function Reservations() {
     try {
       const result = await adminCancelReservation(id);
       if (result.success) {
-        // Refresh list
         await fetchReservations();
       } else {
         alert(result.error || "Failed to cancel reservation.");
@@ -43,6 +43,24 @@ export default function Reservations() {
       alert("An unexpected error occurred.");
     } finally {
       setCancellingId(null);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Permanently delete this reservation? This cannot be undone.")) return;
+
+    setDeletingId(id);
+    try {
+      const result = await deleteReservation(id);
+      if (result.success) {
+        await fetchReservations();
+      } else {
+        alert(result.error || "Failed to delete reservation.");
+      }
+    } catch (err) {
+      alert("An unexpected error occurred.");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -133,22 +151,37 @@ export default function Reservations() {
 
                   {/* Actions */}
                   <div className="flex flex-col gap-2 min-w-[140px]">
-                    {res.status !== 'cancelled' && (
-                      <button
-                        onClick={() => handleCancel(res._id)}
-                        disabled={cancellingId === res._id}
-                        className="w-full bg-white border-2 border-red-50 text-red-500 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-red-50 transition-colors flex items-center justify-center gap-2"
-                      >
-                        {cancellingId === res._id ? (
-                          <Loader2 className="animate-spin" size={14} />
-                        ) : (
-                          <>
-                            <XCircle size={14} />
-                            Cancel Reservation
-                          </>
-                        )}
-                      </button>
+                  {res.status !== 'cancelled' && (
+                    <button
+                      onClick={() => handleCancel(res._id)}
+                      disabled={cancellingId === res._id || deletingId === res._id}
+                      className="w-full bg-white border-2 border-red-50 text-red-500 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-red-50 transition-colors flex items-center justify-center gap-2"
+                    >
+                      {cancellingId === res._id ? (
+                        <Loader2 className="animate-spin" size={14} />
+                      ) : (
+                        <>
+                          <XCircle size={14} />
+                          Cancel Reservation
+                        </>
+                      )}
+                    </button>
+                  )}
+                  
+                  <button
+                    onClick={() => handleDelete(res._id)}
+                    disabled={cancellingId === res._id || deletingId === res._id}
+                    className="w-full bg-white border-2 border-gray-100 text-gray-400 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-red-50 hover:text-red-500 hover:border-red-50 transition-colors flex items-center justify-center gap-2"
+                  >
+                    {deletingId === res._id ? (
+                      <Loader2 className="animate-spin" size={14} />
+                    ) : (
+                      <>
+                        <Trash2 size={14} />
+                        Delete Record
+                      </>
                     )}
+                  </button>
                     <p className="text-[9px] text-center text-gray-400 font-bold uppercase pt-2">
                       ID: {res._id.substring(res._id.length - 8)}
                     </p>
