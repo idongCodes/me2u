@@ -43,6 +43,14 @@ export default function HeaderBrand({ isLoggedIn = false }: HeaderBrandProps) {
         </button>
       </div>
 
+      {/* Backdrop for closing menu on click outside */}
+      {isMenuOpen && (
+        <div 
+          className="fixed inset-0 z-40 bg-black/5 backdrop-blur-[1px]"
+          onClick={() => setIsMenuOpen(false)}
+        />
+      )}
+
       {/* Dropdown Menu */}
       <div 
         className={`absolute top-full left-0 w-full bg-white/95 backdrop-blur-md border-b border-gray-100/50 shadow-md flex flex-col overflow-hidden transition-all duration-300 ease-in-out ${
