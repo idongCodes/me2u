@@ -137,7 +137,7 @@ export async function createReservation(data: {
   });
 
   try {
-    const adminEmail = process.env.ADMIN_EMAIL || "idongcodes@gmail.com";
+    const adminEmail = process.env.ADMIN_EMAIL || "i.d.essien@gmail.com";
     const resendApiKey = process.env.RESEND_API_KEY;
     const twilioSid = process.env.TWILIO_ACCOUNT_SID;
     const twilioAuth = process.env.TWILIO_AUTH_TOKEN;
@@ -257,7 +257,7 @@ export async function cancelReservation(id: string, token: string) {
   await Reservation.updateOne({ _id: id }, { status: "cancelled" });
 
   try {
-    const adminEmail = process.env.ADMIN_EMAIL || "idongcodes@gmail.com";
+    const adminEmail = process.env.ADMIN_EMAIL || "i.d.essien@gmail.com";
     const resendApiKey = process.env.RESEND_API_KEY;
     if (resendApiKey) {
       const resend = new Resend(resendApiKey);
