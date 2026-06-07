@@ -17,7 +17,7 @@ export default function AboutPage() {
         <h1 className="text-3xl font-bold tracking-tight">
           About <span className="text-skyblue">FM2U</span>
         </h1>
-        <div className="text-black/80 text-base max-w-sm space-y-4 text-left leading-relaxed">
+        <div className="text-black/80 text-base max-w-2xl space-y-4 text-left leading-relaxed">
           <p>
             Welcome to From Me 2 U. What started as my good friend and his wife, a fairly new mom of two, asking me to help sell off a plethora of items that were bought for and gifted or donated to her - has turned into an exciting idea to build a custom digital shop to showcase and sell off all the unused, barely used, and no longer used: baby and toddler clothes, shoes, strollers, onesies, cribs, etc., and more from around the home.
           </p>
@@ -27,9 +27,11 @@ export default function AboutPage() {
           <p>
             So shop around, come by and grab things while they're still hot!
           </p>
-          <p className="text-xs text-black/50 text-center pt-2 italic">
-            This is a cash only shopping experience in an effort to deter scammers!
-          </p>
+          <div className="pt-4 flex justify-center">
+            <p className="text-xs text-black/50 text-center italic max-w-sm">
+              This is a cash only shopping experience in an effort to deter scammers!
+            </p>
+          </div>
         </div>
 
         <Link 

@@ -64,7 +64,7 @@ export default async function RootLayout({
         On mobile, it fills the width seamlessly. 
       */}
       <body className="min-h-screen bg-gray-100 flex justify-center font-lora text-foreground selection:bg-skyblue selection:text-white">
-        <div className="w-full max-w-md min-h-screen bg-background shadow-xl flex flex-col relative">
+        <div className="w-full max-w-5xl min-h-screen bg-background shadow-2xl flex flex-col relative">
           <CartProvider>
             <ModalProvider>
               <ToastProvider>
