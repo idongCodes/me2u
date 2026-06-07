@@ -359,3 +359,38 @@ export async function deleteReservation(id: string) {
 
   return { success: true };
 }
+
+export async function adminBulkCancelReservations(ids: string[]) {
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get('admin_session')?.value;
+  const session = await verifySession(sessionCookie);
+
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+
+  await dbConnect();
+  
+  const results = [];
+  for (const id of ids) {
+    const res = await adminCancelReservation(id);
+    results.push({ id, ...res });
+  }
+
+  return { success: true, results };
+}
+
+export async function adminBulkDeleteReservations(ids: string[]) {
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get('admin_session')?.value;
+  const session = await verifySession(sessionCookie);
+
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+
+  await dbConnect();
+  const result = await Reservation.deleteMany({ _id: { $in: ids } });
+
+  return { success: true, deletedCount: result.deletedCount };
+}
