@@ -1,14 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/components/CartProvider";
 import ReservationModal from "@/components/ReservationModal";
+import { useModal } from "@/components/ModalProvider";
 
 export default function CartPage() {
+  const router = useRouter();
+  const modal = useModal();
   const { items, removeItem, totalPrice } = useCart();
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Auto-redirect if cart is empty
+  useEffect(() => {
+    if (items.length === 0) {
+      router.push("/shop");
+    }
+  }, [items.length, router]);
+
+  const handleRemoveItem = async (item: any) => {
+    removeItem(item.id);
+    await modal.alert({
+      type: "info",
+      title: "Removed",
+      message: `${item.name} has been removed from your cart.`
+    });
+    
+    if (items.length === 1) { // It was the last item
+      router.push("/shop");
+    }
+  };
 
   if (items.length === 0) {
     return (
@@ -57,9 +81,14 @@ export default function CartPage() {
         <div className="space-y-4">
           {items.map((item) => (
             <div key={item.id} className="bg-white rounded-xl border border-gray-200 p-3 flex gap-4 shadow-sm items-center">
-              {/* Item Image Placeholder */}
+              {/* Item Image */}
               <div className="w-20 h-20 bg-gray-50 rounded-lg flex-shrink-0 relative overflow-hidden flex items-center justify-center p-2">
-                 <Image src="/shopping.svg" alt={item.name} fill className="object-contain p-2" />
+                 <Image 
+                   src={item.image || "/shopping.svg"} 
+                   alt={item.name} 
+                   fill 
+                   className="object-contain p-2" 
+                 />
               </div>
 
               {/* Item Info */}
@@ -67,7 +96,7 @@ export default function CartPage() {
                 <div className="flex justify-between items-start">
                   <h3 className="font-semibold text-sm text-gray-900 leading-tight">{item.name}</h3>
                   <button 
-                    onClick={() => removeItem(item.id)}
+                    onClick={() => handleRemoveItem(item)}
                     className="text-gray-400 hover:text-red-500 transition-colors p-1"
                     aria-label="Remove item"
                   >

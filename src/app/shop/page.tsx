@@ -6,8 +6,10 @@ import { useCart } from "@/components/CartProvider";
 import { getReservedItemIds } from "@/app/actions/reservation";
 import { getAvailableShopItems as getLiveItems } from "@/app/actions/shop-items";
 import { Lock, ShoppingCart, Tag, Loader2 } from "lucide-react";
+import { useModal } from "@/components/ModalProvider";
 
 export default function ShopPage() {
+  const modal = useModal();
   const { addItem, items: cartItems } = useCart();
   const [items, setItems] = useState<any[]>([]);
   const [reservedIds, setReservedIds] = useState<string[]>([]);
@@ -131,7 +133,29 @@ export default function ShopPage() {
                     
                     <div className="mt-auto pt-2">
                       <button 
-                        onClick={() => addItem({ id: item._id, name: item.name, price: item.price })}
+                        onClick={() => {
+                          const isAlreadyInCart = cartItems.some(i => i.id === item._id);
+                          if (isAlreadyInCart) {
+                            modal.alert({
+                              type: "warning",
+                              title: "Already in Cart",
+                              message: `${item.name} is already in your cart.`
+                            });
+                            return;
+                          }
+
+                          addItem({ 
+                            id: item._id, 
+                            name: item.name, 
+                            price: item.price,
+                            image: item.images?.[0]
+                          });
+                          modal.alert({
+                            type: "success",
+                            title: "Added to Cart",
+                            message: `${item.name} has been added to your cart.`
+                          });
+                        }}
                         disabled={isUnavailable}
                         className={`w-full flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm border-2 ${
                           isReserved 
