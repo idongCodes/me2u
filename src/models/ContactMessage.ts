@@ -7,6 +7,8 @@ export interface IContactMessage extends Document {
   subject: string;
   body: string;
   status: 'unread' | 'read' | 'archived' | 'spam' | 'trash';
+  isDeleted: boolean;
+  deletedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -23,6 +25,8 @@ const ContactMessageSchema = new Schema<IContactMessage>(
       enum: ['unread', 'read', 'archived', 'spam', 'trash'],
       default: 'unread',
     },
+    isDeleted: { type: Boolean, default: false },
+    deletedAt: { type: Date },
   },
   { timestamps: true }
 );

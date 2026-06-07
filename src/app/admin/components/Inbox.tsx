@@ -9,10 +9,23 @@ import {
   AlertOctagon,
   Reply,
   ChevronDown,
-  Loader2
+  Loader2,
+  CheckSquare,
+  Square,
+  MinusSquare,
+  CheckCircle2
 } from 'lucide-react';
-import { getMessages, updateMessageStatus, deleteMessage } from '@/app/actions/inbox';
+import { 
+  getMessages, 
+  updateMessageStatus, 
+  deleteMessage,
+  adminBulkUpdateMessageStatus,
+  adminBulkDeleteMessages,
+  restoreMessage,
+  bulkRestoreMessages
+} from '@/app/actions/inbox';
 import { useModal } from '@/components/ModalProvider';
+import { useToast } from '@/components/ToastProvider';
 
 type Message = {
   id: string;
@@ -25,11 +38,33 @@ type Message = {
   status: 'unread' | 'read' | 'archived' | 'spam' | 'trash';
 };
 
-function MessageCard({ msg, onUpdate }: { msg: Message, onUpdate: () => void }) {
+function MessageCard({ 
+  msg, 
+  onUpdate, 
+  isSelected, 
+  onSelect 
+}: { 
+  msg: Message, 
+  onUpdate: () => void, 
+  isSelected: boolean,
+  onSelect: () => void
+}) {
   const modal = useModal();
+  const toast = useToast();
   const [loading, setLoading] = useState(false);
 
   const handleStatusUpdate = async (status: Message['status']) => {
+    // Only confirm for specific destructive-ish statuses
+    if (status === 'archived' || status === 'trash' || status === 'spam') {
+      const confirmed = await modal.confirm({
+        type: status === 'spam' ? 'warning' : 'info',
+        title: `Move to ${status}`,
+        message: `Move this message to ${status}?`,
+        confirmLabel: `Move to ${status}`,
+      });
+      if (!confirmed) return;
+    }
+
     setLoading(true);
     try {
       await updateMessageStatus(msg.id, status);
@@ -59,7 +94,11 @@ function MessageCard({ msg, onUpdate }: { msg: Message, onUpdate: () => void }) 
     setLoading(true);
     try {
       await deleteMessage(msg.id);
-      onUpdate();
+      await onUpdate();
+      toast.showUndo("Message record deleted", async () => {
+        await restoreMessage(msg.id);
+        await onUpdate();
+      });
     } catch (err) {
       modal.alert({
         type: "danger",
@@ -73,12 +112,18 @@ function MessageCard({ msg, onUpdate }: { msg: Message, onUpdate: () => void }) 
 
   return (
     <div
-      className={`p-6 transition-colors hover:bg-gray-50 dark:hover:bg-gray-750 ${
-        msg.status === 'unread' ? 'bg-blue-50/30 dark:bg-blue-900/10' : ''
-      } ${loading ? 'opacity-50 pointer-events-none' : ''}`}
+      onClick={onSelect}
+      className={`p-6 transition-colors cursor-pointer relative group border-l-4 ${
+        isSelected ? 'bg-skyblue/5 border-skyblue' : 'hover:bg-gray-50 dark:hover:bg-gray-750 border-transparent'
+      } ${msg.status === 'unread' ? 'bg-blue-50/20 dark:bg-blue-900/5' : ''} ${loading ? 'opacity-50 pointer-events-none' : ''}`}
     >
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
-        <div className="flex-1">
+      {/* Selection Indicator */}
+      <div className={`absolute top-6 right-6 transition-all ${isSelected ? 'text-skyblue scale-110' : 'text-gray-200 dark:text-gray-700 group-hover:text-gray-300'}`}>
+        {isSelected ? <CheckCircle2 size={20} /> : <div className="w-5 h-5 border-2 border-current rounded-full" />}
+      </div>
+
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mr-8">
+        <div className="flex-1" onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center gap-3 mb-1">
             <h3
               className={`text-lg ${
@@ -102,7 +147,7 @@ function MessageCard({ msg, onUpdate }: { msg: Message, onUpdate: () => void }) 
           >
             {msg.subject}
           </h4>
-          <p className="text-gray-600 dark:text-gray-400 text-sm whitespace-pre-wrap">
+          <p className="text-gray-600 dark:text-gray-400 text-sm whitespace-pre-wrap leading-relaxed">
             {msg.body}
           </p>
           <div className="mt-3 text-xs text-gray-400 dark:text-gray-500">
@@ -111,7 +156,7 @@ function MessageCard({ msg, onUpdate }: { msg: Message, onUpdate: () => void }) 
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2 sm:flex-col lg:flex-row">
+        <div className="flex items-center gap-2 sm:flex-col lg:flex-row" onClick={(e) => e.stopPropagation()}>
           <button
             onClick={() => handleStatusUpdate(msg.status === 'unread' ? 'read' : 'unread')}
             title={msg.status === 'unread' ? 'Mark as Read' : 'Mark as Unread'}
@@ -171,15 +216,29 @@ function MessageCard({ msg, onUpdate }: { msg: Message, onUpdate: () => void }) 
   );
 }
 
-function InboxSection({ title, messages, defaultOpen = false, onUpdate }: { title: string, messages: Message[], defaultOpen?: boolean, onUpdate: () => void }) {
+function InboxSection({ 
+  title, 
+  messages, 
+  defaultOpen = false, 
+  onUpdate,
+  selectedIds,
+  onSelectOne
+}: { 
+  title: string, 
+  messages: Message[], 
+  defaultOpen?: boolean, 
+  onUpdate: () => void,
+  selectedIds: string[],
+  onSelectOne: (id: string) => void
+}) {
   if (messages.length === 0) return null;
 
   return (
     <details className="group [&_summary::-webkit-details-marker]:hidden" open={defaultOpen}>
-      <summary className="flex items-center justify-between px-6 py-4 cursor-pointer bg-gray-50 dark:bg-gray-800 border-y border-gray-100 dark:border-gray-700 select-none hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+      <summary className="flex items-center justify-between px-6 py-4 cursor-pointer bg-gray-50 dark:bg-gray-800 border-y border-gray-100 dark:border-gray-700 select-none hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-900 dark:text-white">
         <div className="flex items-center gap-3">
-          <h2 className="text-sm font-black uppercase tracking-widest text-gray-900 dark:text-white capitalize">{title}</h2>
-          <span className="text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded-full font-medium">
+          <h2 className="text-sm font-black uppercase tracking-widest">{title}</h2>
+          <span className="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded-full font-medium">
             {messages.length}
           </span>
         </div>
@@ -187,7 +246,13 @@ function InboxSection({ title, messages, defaultOpen = false, onUpdate }: { titl
       </summary>
       <div className="divide-y divide-gray-100 dark:divide-gray-700">
         {messages.map((msg) => (
-          <MessageCard key={msg.id} msg={msg} onUpdate={onUpdate} />
+          <MessageCard 
+            key={msg.id} 
+            msg={msg} 
+            onUpdate={onUpdate} 
+            isSelected={selectedIds.includes(msg.id)}
+            onSelect={() => onSelectOne(msg.id)}
+          />
         ))}
       </div>
     </details>
@@ -195,14 +260,19 @@ function InboxSection({ title, messages, defaultOpen = false, onUpdate }: { titl
 }
 
 export default function Inbox() {
+  const modal = useModal();
+  const toast = useToast();
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [bulkLoading, setBulkLoading] = useState(false);
 
   const fetchMessages = async () => {
     try {
       const data = await getMessages();
       setMessages(data);
+      setSelectedIds([]); // Clear selection on refresh
     } catch (err) {
       setError("Failed to load messages.");
     } finally {
@@ -213,6 +283,72 @@ export default function Inbox() {
   useEffect(() => {
     fetchMessages();
   }, []);
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === messages.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(messages.map(m => m.id));
+    }
+  };
+
+  const toggleSelectOne = (id: string) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const handleBulkStatusUpdate = async (status: Message['status']) => {
+    const confirmed = await modal.confirm({
+      type: status === 'trash' ? 'warning' : 'info',
+      title: `Bulk ${status}`,
+      message: `Are you sure you want to move ${selectedIds.length} messages to ${status}?`,
+      confirmLabel: `Move to ${status}`,
+    });
+
+    if (!confirmed) return;
+
+    setBulkLoading(true);
+    try {
+      await adminBulkUpdateMessageStatus(selectedIds, status);
+      await fetchMessages();
+      modal.alert({
+        type: "success",
+        title: "Success",
+        message: `${selectedIds.length} messages updated.`
+      });
+    } catch (err) {
+      modal.alert({ type: "danger", title: "Error", message: "Bulk update failed." });
+    } finally {
+      setBulkLoading(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    const confirmed = await modal.confirm({
+      type: "danger",
+      title: "Bulk Delete",
+      message: `Are you sure you want to PERMANENTLY delete ${selectedIds.length} messages? This cannot be undone.`,
+      confirmLabel: "Delete Forever",
+    });
+
+    if (!confirmed) return;
+
+    setBulkLoading(true);
+    try {
+      const idsToRestore = [...selectedIds];
+      await adminBulkDeleteMessages(selectedIds);
+      await fetchMessages();
+      toast.showUndo(`${idsToRestore.length} messages deleted`, async () => {
+        await bulkRestoreMessages(idsToRestore);
+        await fetchMessages();
+      });
+    } catch (err) {
+      modal.alert({ type: "danger", title: "Error", message: "Bulk deletion failed." });
+    } finally {
+      setBulkLoading(false);
+    }
+  };
 
   if (loading && messages.length === 0) {
     return (
@@ -230,13 +366,57 @@ export default function Inbox() {
 
   return (
     <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-white dark:bg-gray-900">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Messages</h2>
-        {unreadMessages.length > 0 && (
-          <span className="text-[10px] font-black uppercase bg-skyblue text-black px-2.5 py-1 rounded-full">
-            {unreadMessages.length} new
-          </span>
-        )}
+      <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-gray-900">
+        <div className="flex items-center gap-4">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Messages</h2>
+          {messages.length > 0 && (
+            <button 
+              onClick={toggleSelectAll}
+              className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-black transition-colors"
+            >
+              {selectedIds.length === messages.length ? <CheckSquare size={16} className="text-skyblue" /> : selectedIds.length > 0 ? <MinusSquare size={16} className="text-skyblue" /> : <Square size={16} />}
+              <span>{selectedIds.length === messages.length ? "Deselect All" : "Select All"}</span>
+            </button>
+          )}
+        </div>
+
+        <div className="flex items-center gap-3">
+          {selectedIds.length > 0 && (
+            <div className="flex items-center gap-2 animate-in slide-in-from-right-2">
+              <button
+                onClick={() => handleBulkStatusUpdate('archived')}
+                disabled={bulkLoading}
+                className="p-2 text-gray-500 hover:text-yellow-500 hover:bg-yellow-50 rounded-full transition-colors"
+                title="Archive Selected"
+              >
+                <Archive size={20} />
+              </button>
+              <button
+                onClick={() => handleBulkStatusUpdate('trash')}
+                disabled={bulkLoading}
+                className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                title="Move Selected to Trash"
+              >
+                <Trash2 size={20} />
+              </button>
+              <button
+                onClick={handleBulkDelete}
+                disabled={bulkLoading}
+                className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-100 rounded-full transition-colors"
+                title="Delete Selected Forever"
+              >
+                <Trash2 size={20} color="red" />
+              </button>
+              <div className="h-6 w-px bg-gray-200 dark:bg-gray-800 mx-1" />
+            </div>
+          )}
+          <button 
+            onClick={fetchMessages}
+            className="text-xs font-bold text-skyblue uppercase tracking-wider hover:underline"
+          >
+            Refresh
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-col">
@@ -246,11 +426,42 @@ export default function Inbox() {
           </div>
         ) : (
           <>
-            <InboxSection title="Unread" messages={unreadMessages} defaultOpen={true} onUpdate={fetchMessages} />
-            <InboxSection title="Read" messages={readMessages} onUpdate={fetchMessages} />
-            <InboxSection title="Archived" messages={archivedMessages} onUpdate={fetchMessages} />
-            <InboxSection title="Spam" messages={spamMessages} onUpdate={fetchMessages} />
-            <InboxSection title="Trash" messages={trashMessages} onUpdate={fetchMessages} />
+            <InboxSection 
+              title="Unread" 
+              messages={unreadMessages} 
+              defaultOpen={true} 
+              onUpdate={fetchMessages} 
+              selectedIds={selectedIds}
+              onSelectOne={toggleSelectOne}
+            />
+            <InboxSection 
+              title="Read" 
+              messages={readMessages} 
+              onUpdate={fetchMessages} 
+              selectedIds={selectedIds}
+              onSelectOne={toggleSelectOne}
+            />
+            <InboxSection 
+              title="Archived" 
+              messages={archivedMessages} 
+              onUpdate={fetchMessages} 
+              selectedIds={selectedIds}
+              onSelectOne={toggleSelectOne}
+            />
+            <InboxSection 
+              title="Spam" 
+              messages={spamMessages} 
+              onUpdate={fetchMessages} 
+              selectedIds={selectedIds}
+              onSelectOne={toggleSelectOne}
+            />
+            <InboxSection 
+              title="Trash" 
+              messages={trashMessages} 
+              onUpdate={fetchMessages} 
+              selectedIds={selectedIds}
+              onSelectOne={toggleSelectOne}
+            />
           </>
         )}
       </div>
