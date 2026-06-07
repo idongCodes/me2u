@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { useModal } from "@/components/ModalProvider";
 import { useToast } from "@/components/ToastProvider";
+import { formatTo12hr } from "@/lib/time";
 
 export default function Reservations() {
   const modal = useModal();
@@ -305,7 +306,7 @@ export default function Reservations() {
                         </div>
                         <div className="flex items-center gap-2">
                           <Calendar size={14} className="text-gray-300 dark:text-gray-600" />
-                          {res.date} at {res.time}
+                          {res.date} at {formatTo12hr(res.time)}
                         </div>
                         <div className="flex items-center gap-2">
                           <ShoppingBag size={14} className="text-gray-300 dark:text-gray-600" />
