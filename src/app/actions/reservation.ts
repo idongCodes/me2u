@@ -5,6 +5,8 @@ import Reservation from "@/models/Reservation";
 import { Resend } from "resend";
 import twilio from "twilio";
 import crypto from "crypto";
+import { cookies } from 'next/headers';
+import { verifySession } from '@/lib/auth';
 
 // Generate times from 10:00 to 17:00 in 30-min intervals
 // 15 min block + 15 min buffer = 30 min spacing
@@ -255,4 +257,86 @@ export async function getReservedItemIds() {
   });
 
   return Array.from(reservedIds);
+}
+
+export async function getAllReservations() {
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get('admin_session')?.value;
+  const session = await verifySession(sessionCookie);
+
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+
+  await dbConnect();
+  const reservations = await Reservation.find({}).sort({ createdAt: -1 });
+  return JSON.parse(JSON.stringify(reservations));
+}
+
+export async function adminCancelReservation(id: string) {
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get('admin_session')?.value;
+  const session = await verifySession(sessionCookie);
+
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+
+  await dbConnect();
+  const reservation = await Reservation.findById(id);
+
+  if (!reservation) {
+    return { success: false, error: "Reservation not found." };
+  }
+
+  if (reservation.status === "cancelled") {
+    return { success: false, error: "Reservation is already cancelled." };
+  }
+
+  await Reservation.updateOne({ _id: id }, { status: "cancelled" });
+
+  // Send Cancellation Notifications
+  try {
+    const adminEmail = process.env.ADMIN_EMAIL || "idongcodes@gmail.com";
+    const resendApiKey = process.env.RESEND_API_KEY;
+    const twilioSid = process.env.TWILIO_ACCOUNT_SID;
+    const twilioAuth = process.env.TWILIO_AUTH_TOKEN;
+    const twilioPhone = process.env.TWILIO_PHONE_NUMBER;
+    const adminPhone = "+17743126471";
+
+    const cancelText = `Reservation for ${reservation.name} on ${reservation.date} at ${reservation.time} has been CANCELLED by ADMIN.`;
+
+    if (resendApiKey) {
+      const resend = new Resend(resendApiKey);
+      
+      // Notify Admin
+      await resend.emails.send({
+        from: "Me2U Reservations <hello@fromme2u.app>",
+        to: adminEmail,
+        subject: `ADMIN CANCELLED: Reservation - ${reservation.name}`,
+        text: cancelText,
+      });
+
+      // Notify Customer
+      await resend.emails.send({
+        from: "Me2U <hello@fromme2u.app>",
+        to: reservation.email,
+        subject: "Reservation Cancelled by Me2U",
+        text: `Hi ${reservation.name}, your reservation for ${reservation.date} at ${reservation.time} has been cancelled by the shop. All reserved items are now available for others. We hope to see you another time!`,
+      });
+    }
+
+    if (twilioSid && twilioAuth && twilioPhone) {
+      const client = twilio(twilioSid, twilioAuth);
+      await client.messages.create({
+        body: `ADMIN CANCELLED: ${cancelText}`,
+        from: twilioPhone,
+        to: adminPhone,
+      }).catch(err => console.error("Twilio Admin Cancel SMS Error:", err));
+    }
+  } catch (error) {
+    console.error("Cancellation Notification Error:", error);
+  }
+
+  return { success: true };
 }
