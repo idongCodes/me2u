@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useCart } from "@/components/CartProvider";
 import { getReservedItemIds } from "@/app/actions/reservation";
 import { getAvailableShopItems as getLiveItems } from "@/app/actions/shop-items";
-import { Lock, ShoppingCart, Tag, Loader2 } from "lucide-react";
+import { Lock, ShoppingCart, Tag, Loader2, CheckCircle2, Square, CheckSquare, Trash2, Plus, X } from "lucide-react";
 import { useModal } from "@/components/ModalProvider";
 
 export default function ShopPage() {
@@ -14,6 +14,51 @@ export default function ShopPage() {
   const [items, setItems] = useState<any[]>([]);
   const [reservedIds, setReservedIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  const availableItems = items.filter(item => 
+    !reservedIds.includes(item._id) && 
+    item.status !== 'reserved' && 
+    !cartItems.some(i => i.id === item._id)
+  );
+
+  const toggleSelection = (id: string) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedIds.length === availableItems.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(availableItems.map(i => i._id));
+    }
+  };
+
+  const handleBulkAdd = async () => {
+    const itemsToAdd = availableItems.filter(i => selectedIds.includes(i._id));
+    
+    itemsToAdd.forEach(item => {
+      addItem({ 
+        id: item._id, 
+        name: item.name, 
+        price: item.price,
+        image: item.images?.[0]
+      });
+    });
+
+    await modal.alert({
+      type: "success",
+      title: "Items Added",
+      message: `${itemsToAdd.length} items have been added to your cart.`
+    });
+
+    setSelectedIds([]);
+  };
+
+  const selectedItems = items.filter(i => selectedIds.includes(i._id));
+  const selectedTotal = selectedItems.reduce((acc, curr) => acc + curr.price, 0);
 
   const fetchData = async () => {
     try {
@@ -63,10 +108,21 @@ export default function ShopPage() {
               See what is available, add to cart to reserve or view total.
             </p>
           </div>
+          
+          {/* Select All Toggle */}
+          {availableItems.length > 1 && (
+            <button 
+              onClick={handleSelectAll}
+              className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-skyblue transition-colors bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100"
+            >
+              {selectedIds.length === availableItems.length ? <CheckSquare size={14} className="text-skyblue" /> : <Square size={14} />}
+              <span>{selectedIds.length === availableItems.length ? "Deselect All" : `Select All (${availableItems.length})`}</span>
+            </button>
+          )}
         </div>
 
         {/* Shop Items Grid */}
-        <div className="w-full mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="w-full mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-32">
           
           {items.length === 0 ? (
             <div className="col-span-full py-20 text-center space-y-4 opacity-50">
@@ -77,11 +133,24 @@ export default function ShopPage() {
             items.map((item) => {
               const isReserved = reservedIds.includes(item._id) || item.status === 'reserved';
               const isInCart = cartItems.some(i => i.id === item._id);
+              const isSelected = selectedIds.includes(item._id);
               const isUnavailable = isReserved || isInCart;
 
               return (
-                <div key={item._id} className={`bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col transition-all ${isReserved ? 'opacity-75 grayscale-[0.5]' : ''}`}>
-                  
+                <div 
+                  key={item._id} 
+                  onClick={() => !isUnavailable && toggleSelection(item._id)}
+                  className={`bg-white rounded-3xl border shadow-sm overflow-hidden flex flex-col transition-all cursor-pointer relative group ${
+                    isSelected ? 'border-skyblue ring-4 ring-skyblue/10 scale-[1.02]' : 'border-gray-200 hover:border-gray-300'
+                  } ${isReserved ? 'opacity-75 grayscale-[0.5]' : ''}`}
+                >
+                  {/* Selection Indicator */}
+                  {!isUnavailable && (
+                    <div className={`absolute top-4 right-4 z-20 transition-all ${isSelected ? 'text-skyblue scale-110' : 'text-white/80 opacity-0 group-hover:opacity-100'}`}>
+                      {isSelected ? <CheckCircle2 size={28} fill="white" /> : <div className="w-7 h-7 border-2 border-current rounded-full bg-black/10 backdrop-blur-sm" />}
+                    </div>
+                  )}
+
                   {/* Image Carousel (Snap Scrolling) */}
                   <div 
                     className="relative w-full aspect-square flex overflow-x-auto snap-x snap-mandatory [&::-webkit-scrollbar]:hidden" 
@@ -128,7 +197,7 @@ export default function ShopPage() {
                       {item.description}
                     </p>
                     
-                    <div className="mt-auto pt-2">
+                    <div className="mt-auto pt-2" onClick={(e) => e.stopPropagation()}>
                       <button 
                         onClick={() => {
                           const isAlreadyInCart = cartItems.some(i => i.id === item._id);
@@ -159,7 +228,9 @@ export default function ShopPage() {
                             ? 'bg-gray-100 text-gray-400 border-gray-100 cursor-not-allowed'
                             : isInCart
                               ? 'bg-skyblue/10 text-skyblue border-skyblue/20 cursor-default'
-                              : 'bg-black text-white border-black hover:bg-skyblue hover:text-black hover:border-skyblue'
+                              : isSelected
+                                ? 'bg-skyblue text-black border-skyblue'
+                                : 'bg-black text-white border-black hover:bg-skyblue hover:text-black hover:border-skyblue'
                         }`}
                       >
                         {isReserved ? (
@@ -171,6 +242,11 @@ export default function ShopPage() {
                           <>
                             <ShoppingCart size={12} />
                             In Cart
+                          </>
+                        ) : isSelected ? (
+                          <>
+                            <CheckCircle2 size={12} />
+                            Selected
                           </>
                         ) : (
                           <>
@@ -188,7 +264,38 @@ export default function ShopPage() {
           )}
           
         </div>
-        
+
+        {/* Floating Bulk Action Bar */}
+        {selectedIds.length > 0 && (
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-sm px-4 animate-in slide-in-from-bottom-8 duration-300">
+            <div className="bg-black/90 backdrop-blur-md text-white rounded-3xl p-4 shadow-2xl flex items-center justify-between gap-4 border border-white/10">
+              <div className="pl-2">
+                <p className="text-xs font-black uppercase tracking-widest text-skyblue">
+                  {selectedIds.length} {selectedIds.length === 1 ? 'Item' : 'Items'} Selected
+                </p>
+                <p className="text-xl font-black tracking-tighter">
+                  ${selectedTotal}
+                </p>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => setSelectedIds([])}
+                  className="p-3 text-white/50 hover:text-white transition-colors"
+                >
+                  <X size={20} />
+                </button>
+                <button 
+                  onClick={handleBulkAdd}
+                  className="bg-skyblue text-black px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-tighter flex items-center gap-2 active:scale-95 transition-all shadow-lg"
+                >
+                  <Plus size={16} strokeWidth={3} />
+                  Add to Cart
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );
