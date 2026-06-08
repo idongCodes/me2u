@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useCart } from "@/components/CartProvider";
 import { getReservedItemIds } from "@/app/actions/reservation";
 import { getAvailableShopItems as getLiveItems } from "@/app/actions/shop-items";
-import { Lock, ShoppingCart, Tag, Loader2, CheckCircle2, Square, CheckSquare, Trash2, Plus, X } from "lucide-react";
+import { Lock, ShoppingCart, Tag, Loader2, CheckCircle2, Square, CheckSquare, Trash2, Plus, X, Share2 } from "lucide-react";
 import { useModal } from "@/components/ModalProvider";
 
 export default function ShopPage() {
@@ -78,6 +78,38 @@ export default function ShopPage() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const handleShare = async (e: React.MouseEvent, item: any) => {
+    e.stopPropagation(); // prevent card click
+    // Build the direct item URL. If window is available, use it.
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    const url = `${baseUrl}/shop/${item._id}`;
+    
+    const shareData = {
+      title: `${item.name} - $${item.price}`,
+      text: item.description,
+      url: url,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        // User cancelled or failed
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        modal.alert({
+          type: "success",
+          title: "Link Copied",
+          message: "Item link has been copied to your clipboard."
+        });
+      } catch (err) {
+        console.error("Failed to copy", err);
+      }
+    }
+  };
 
   if (loading) {
     return (
@@ -190,7 +222,16 @@ export default function ShopPage() {
                   <div className="p-5 flex flex-col flex-1 gap-2">
                     <div className="flex justify-between items-start gap-4">
                       <h3 className="font-bold text-lg text-gray-900 leading-tight">{item.name}</h3>
-                      <span className="font-black text-skyblue text-lg whitespace-nowrap">${item.price}</span>
+                      <div className="flex flex-col items-end gap-2">
+                        <span className="font-black text-skyblue text-lg whitespace-nowrap">${item.price}</span>
+                        <button 
+                          onClick={(e) => handleShare(e, item)}
+                          className="text-gray-400 hover:text-skyblue transition-colors p-1"
+                          aria-label="Share item"
+                        >
+                          <Share2 size={16} />
+                        </button>
+                      </div>
                     </div>
                     
                     <p className="text-sm text-gray-600 leading-relaxed">

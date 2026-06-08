@@ -31,6 +31,19 @@ export async function getAvailableShopItems() {
   return JSON.parse(JSON.stringify(items));
 }
 
+export async function getShopItemById(id: string) {
+  await dbConnect();
+  try {
+    const item = await ShopItem.findOne({
+      _id: id,
+      isDeleted: { $ne: true }
+    });
+    return item ? JSON.parse(JSON.stringify(item)) : null;
+  } catch (error) {
+    return null;
+  }
+}
+
 export async function createShopItem(data: {
   name: string;
   price: number;
