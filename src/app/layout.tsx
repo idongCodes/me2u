@@ -29,10 +29,6 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
-  icons: {
-    icon: "/shopping.svg",
-    apple: "/shopping.svg",
-  },
   openGraph: {
     title: "Me2U | Gently Used Home Goods in Worcester, MA",
     description: "Your local source for trusted, gently used baby and toddler items. Smoke-free, pet-free, and neighborhood-approved.",
