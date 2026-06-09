@@ -26,14 +26,26 @@ export async function generateMetadata({
   // Use the first image if available, else a fallback or relative path
   // If the image is a relative path starting with /, it might need the base URL for Open Graph to work properly in all clients, but Next.js usually handles full URL generation if metadataBase is set. Since we don't know if metadataBase is set, relative works for some scrapers or we just provide what we have.
   const imageUrl = item.images?.[0] || "/undraw_online-shopping_po8w.svg";
+  const itemUrl = `/shop/${resolvedParams.id}`;
 
   return {
     title,
     description,
+    alternates: {
+      canonical: itemUrl,
+    },
     openGraph: {
       title,
       description,
-      images: [imageUrl],
+      url: itemUrl,
+      images: [
+        {
+          url: imageUrl,
+          width: 800,
+          height: 800,
+          alt: item.name,
+        },
+      ],
       type: "website",
     },
     twitter: {
