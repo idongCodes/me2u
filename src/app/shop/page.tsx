@@ -7,6 +7,7 @@ import { getReservedItemIds } from "@/app/actions/reservation";
 import { getAvailableShopItems as getLiveItems } from "@/app/actions/shop-items";
 import { Lock, ShoppingCart, Tag, Loader2, CheckCircle2, Square, CheckSquare, Trash2, Plus, X, Share2 } from "lucide-react";
 import { useModal } from "@/components/ModalProvider";
+import { getItemUrl } from "@/lib/utils";
 
 export default function ShopPage() {
   const modal = useModal();
@@ -83,7 +84,8 @@ export default function ShopPage() {
     e.stopPropagation(); // prevent card click
     // Build the direct item URL. If window is available, use it.
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
-    const url = `${baseUrl}/shop/${item._id}`;
+    const itemPath = getItemUrl(item);
+    const url = `${baseUrl}${itemPath}`;
     
     const shareData = {
       title: `${item.name} - $${item.price}`,
