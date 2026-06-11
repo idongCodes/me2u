@@ -7,6 +7,7 @@ import { useCart } from "@/components/CartProvider";
 import { getReservedItemIds } from "@/app/actions/reservation";
 import { Lock, ShoppingCart, Tag, ArrowLeft, Share2 } from "lucide-react";
 import { useModal } from "@/components/ModalProvider";
+import { getItemUrl } from "@/lib/utils";
 
 export default function ItemDetailsClient({ item }: { item: any }) {
   const router = useRouter();
@@ -34,7 +35,10 @@ export default function ItemDetailsClient({ item }: { item: any }) {
   const isUnavailable = isReserved || isInCart;
 
   const handleShare = async () => {
-    const url = window.location.href;
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    const itemPath = getItemUrl(item);
+    const url = `${baseUrl}${itemPath}`;
+    
     const shareData = {
       title: `${item.name} - $${item.price}`,
       text: item.description,

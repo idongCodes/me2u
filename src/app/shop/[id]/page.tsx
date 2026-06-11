@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { getShopItemById } from "@/app/actions/shop-items";
 import { notFound } from "next/navigation";
 import ItemDetailsClient from "./ItemDetailsClient";
+import { getItemUrl } from "@/lib/utils";
 
 export async function generateMetadata({
   params,
@@ -26,7 +27,7 @@ export async function generateMetadata({
   // Use the first image if available, else a fallback or relative path
   // If the image is a relative path starting with /, it might need the base URL for Open Graph to work properly in all clients, but Next.js usually handles full URL generation if metadataBase is set. Since we don't know if metadataBase is set, relative works for some scrapers or we just provide what we have.
   const imageUrl = item.images?.[0] || "/undraw_online-shopping_po8w.svg";
-  const itemUrl = `/shop/${resolvedParams.id}`;
+  const itemUrl = getItemUrl(item);
 
   return {
     title,

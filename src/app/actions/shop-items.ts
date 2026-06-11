@@ -5,6 +5,7 @@ import ShopItem from "@/models/ShopItem";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
+import { extractIdFromSlug } from "@/lib/utils";
 
 async function checkAdminAuth() {
   const cookieStore = await cookies();
@@ -34,8 +35,9 @@ export async function getAvailableShopItems() {
 export async function getShopItemById(id: string) {
   await dbConnect();
   try {
+    const actualId = extractIdFromSlug(id);
     const item = await ShopItem.findOne({
-      _id: id,
+      _id: actualId,
       isDeleted: { $ne: true }
     });
     return item ? JSON.parse(JSON.stringify(item)) : null;
