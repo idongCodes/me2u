@@ -31,19 +31,19 @@ body {
 }
 
 *::-webkit-scrollbar-thumb {
-  background: var(--skyblue);
+  background: #0ea5e9; /* Sky blue */
   border-radius: 10px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: var(--skyblue);
+  background: #0ea5e9;
 }
 
 *::-webkit-scrollbar-thumb:active {
-  background: var(--foreground);
+  background: #000000; /* Black */
 }
 
 * {
   scrollbar-width: auto;
-  scrollbar-color: var(--skyblue) transparent;
+  scrollbar-color: #0ea5e9 transparent;
 }
