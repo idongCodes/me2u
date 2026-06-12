@@ -31,7 +31,7 @@ body {
 }
 
 *::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--skyblue);
   border-radius: 10px;
 }
 
@@ -39,7 +39,11 @@ body {
   background: var(--skyblue);
 }
 
+*::-webkit-scrollbar-thumb:active {
+  background: var(--foreground);
+}
+
 * {
   scrollbar-width: auto;
-  scrollbar-color: #cbd5e1 transparent;
+  scrollbar-color: var(--skyblue) transparent;
 }
